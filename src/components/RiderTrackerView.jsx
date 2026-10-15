@@ -1,41 +1,11 @@
 import React, { useState } from 'react';
 import { Bike, DollarSign, Clock, Phone, CheckCircle2, UserPlus, AlertCircle, Send, Check } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { recordRiderHandover } from '../services/posService';
+import { INITIAL_RIDERS, RIDER_STATUS } from '../data/mockData';
 
 export function RiderTrackerView({ orders, onUpdateOrders }) {
-  const [riders, setRiders] = useState([
-    {
-      id: 'r1',
-      name: 'Muhammad Bilal Khan',
-      phone: '0300-8291024',
-      cnic: '42101-9284719-1',
-      bikeNo: 'KHI-9921 (Honda 125)',
-      status: 'on_delivery',
-      cashSurrendered: 2500,
-      totalTrips: 6
-    },
-    {
-      id: 'r2',
-      name: 'Hamza Farooq',
-      phone: '0312-4820194',
-      cnic: '42201-1928401-3',
-      bikeNo: 'KHI-4412 (Unique 70)',
-      status: 'available',
-      cashSurrendered: 4200,
-      totalTrips: 9
-    },
-    {
-      id: 'r3',
-      name: 'Zeeshan Ali',
-      phone: '0333-5182940',
-      cnic: '42301-8172948-5',
-      bikeNo: 'KHI-7810 (Super Power)',
-      status: 'available',
-      cashSurrendered: 1800,
-      totalTrips: 4
-    }
-  ]);
-
+  const [riders, setRiders] = useState(INITIAL_RIDERS);
   const [activeTab, setActiveTab] = useState('ledger'); // 'ledger', 'dispatch', 'settle'
   const [selectedRiderForSettlement, setSelectedRiderForSettlement] = useState(null);
   const [settlementAmount, setSettlementAmount] = useState('');
@@ -51,16 +21,18 @@ export function RiderTrackerView({ orders, onUpdateOrders }) {
     const assignedOrders = deliveryOrders.filter(
       o => o.deliveryInfo?.riderId === rider.id || o.deliveryInfo?.riderName?.includes(rider.name.split(' ')[0])
     );
-    // Include initial sample delivery orders for realism
-    const initialBaseCollected = rider.id === 'r1' ? 4850 : rider.id === 'r2' ? 6400 : 2950;
-    const dynamicCollected = assignedOrders.reduce((sum, o) => sum + (o.paymentMethod === 'rider_cod' || o.paymentMethod === 'cash' ? o.total : 0), 0);
-    const totalCollected = initialBaseCollected + dynamicCollected;
-    const netCashOwed = Math.max(0, totalCollected - rider.cashSurrendered);
+    const dynamicCollected = assignedOrders.reduce(
+      (sum, o) => sum + (o.paymentMethod === 'rider_cod' || o.paymentMethod === 'cash' ? o.total : 0),
+      0
+    );
+    const totalCollected = dynamicCollected;
+    const surrendered = rider.cashSurrendered || 0;
+    const netCashOwed = Math.max(0, totalCollected - surrendered);
 
     return {
-      assignedCount: assignedOrders.length + (rider.id === 'r1' ? 3 : rider.id === 'r2' ? 4 : 2),
+      assignedCount: assignedOrders.length,
       totalCollected,
-      cashSurrendered: rider.cashSurrendered,
+      cashSurrendered: surrendered,
       netCashOwed
     };
   }
@@ -72,17 +44,28 @@ export function RiderTrackerView({ orders, onUpdateOrders }) {
     setSettlementAmount(metrics.netCashOwed.toString());
   }
 
-  function confirmSettlement() {
+  async function confirmSettlement() {
     if (!selectedRiderForSettlement) return;
     const amount = Number(settlementAmount) || 0;
     if (amount <= 0) return;
+
+    try {
+      await recordRiderHandover({
+        riderId: selectedRiderForSettlement.rider.id,
+        amount,
+        notes: `Shift settlement for ${selectedRiderForSettlement.rider.name}`
+      });
+    } catch (e) {
+      console.warn('Could not record cash handover in IndexedDB:', e);
+    }
 
     setRiders(prev =>
       prev.map(r => {
         if (r.id === selectedRiderForSettlement.rider.id) {
           return {
             ...r,
-            cashSurrendered: r.cashSurrendered + amount
+            cashSurrendered: (r.cashSurrendered || 0) + amount,
+            status: RIDER_STATUS.AVAILABLE
           };
         }
         return r;

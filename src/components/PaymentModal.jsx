@@ -39,12 +39,20 @@ export function PaymentModal({
     setTenderedAmount(prev => prev + amount);
   }
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   function handleSubmit() {
-    onCompletePayment({
-      method,
-      tendered: method === 'cash' ? tenderedAmount : totalAmount,
-      change: method === 'cash' ? changeDue : 0
-    });
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    try {
+      onCompletePayment({
+        method,
+        tendered: method === 'cash' ? tenderedAmount : totalAmount,
+        change: method === 'cash' ? changeDue : 0
+      });
+    } catch (err) {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -261,12 +269,13 @@ export function PaymentModal({
           {/* Confirm & Thermal Print Button */}
           <button
             type="button"
+            disabled={isSubmitting}
             onClick={handleSubmit}
             style={{
               width: '100%',
               padding: '16px',
               borderRadius: '12px',
-              background: 'linear-gradient(135deg, #10b981, #059669)',
+              background: isSubmitting ? '#475569' : 'linear-gradient(135deg, #10b981, #059669)',
               color: '#fff',
               fontFamily: 'var(--font-display)',
               fontSize: '16px',
@@ -275,11 +284,12 @@ export function PaymentModal({
               alignItems: 'center',
               justifyContent: 'center',
               gap: '10px',
-              boxShadow: 'var(--shadow-glow-emerald)'
+              boxShadow: isSubmitting ? 'none' : 'var(--shadow-glow-emerald)',
+              cursor: isSubmitting ? 'not-allowed' : 'pointer'
             }}
           >
             <Printer size={20} />
-            <span>Confirm & Print 80mm Receipt (Enter)</span>
+            <span>{isSubmitting ? 'Recording & Securing...' : 'Confirm & Print 80mm Receipt (Enter)'}</span>
           </button>
         </div>
       </div>

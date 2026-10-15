@@ -17,69 +17,78 @@ import {
 export function OwnerDashboardView({ orders, menuItems, activeShift }) {
   const [isMobileFrame, setIsMobileFrame] = useState(false);
 
-  // Compute live owner analytics
+  // Compute live owner analytics strictly from genuine stored records
   const completedOrders = orders.filter(o => o.status === 'completed');
   const voidedOrders = orders.filter(o => o.status === 'cancelled' || o.isVoided);
 
-  // Revenue metrics
-  const totalRevenue = completedOrders.reduce((sum, o) => sum + (o.total || 0), 0) + 24800; // Adding base day sales
+  // Authoritative Revenue Metrics
+  const totalRevenue = completedOrders.reduce((sum, o) => sum + (o.total || 0), 0);
   const cashRevenue = completedOrders
     .filter(o => o.paymentMethod === 'cash')
-    .reduce((sum, o) => sum + (o.total || 0), 0) + 16500;
+    .reduce((sum, o) => sum + (o.total || 0), 0);
   const cardRevenue = completedOrders
     .filter(o => o.paymentMethod === 'card')
-    .reduce((sum, o) => sum + (o.total || 0), 0) + 5300;
+    .reduce((sum, o) => sum + (o.total || 0), 0);
   const codRevenue = completedOrders
     .filter(o => o.paymentMethod === 'rider_cod')
-    .reduce((sum, o) => sum + (o.total || 0), 0) + 3000;
+    .reduce((sum, o) => sum + (o.total || 0), 0);
 
   // Active open dine-in tables
-  const activeTables = [
-    { tableNo: 'T-04 (Main Hall)', guests: 4, amount: 2530, duration: '28m', status: 'Dining' },
-    { tableNo: 'T-07 (Family Room)', guests: 6, amount: 4890, duration: '45m', status: 'Served' },
-    { tableNo: 'T-12 (Courtyard)', guests: 2, amount: 1360, duration: '12m', status: 'Cooking' }
-  ];
+  const activeTables = orders
+    .filter(o => o.mode === 'dine_in' && o.status !== 'cancelled')
+    .slice(0, 5)
+    .map((o, idx) => ({
+      tableNo: o.tableNo || `Table ${idx + 1}`,
+      guests: 4,
+      amount: o.total,
+      duration: 'Recent',
+      status: 'Served'
+    }));
 
-  // Top selling items
-  const topDishes = [
-    { name: 'Quarter Chicken Broast', urdu: 'کوآرٹر چکن بروسٹ', count: 54, sales: 36720, station: 'Fryer' },
-    { name: 'Special Beef Nalli Biryani', urdu: 'اسپیشل بیف نلی بریانی', count: 38, sales: 19760, station: 'Daigh' },
-    { name: 'Chicken Shinwari Karahi', urdu: 'شنواری چکن کڑاہی', count: '24.5 kg', sales: 45325, station: 'Karahi' },
-    { name: 'Peshawari Chapli Kabab', urdu: 'پشاوری چپلی کباب', count: 32, sales: 15360, station: 'BBQ' },
-    { name: 'Special Roghni Naan', urdu: 'روغنی نان', count: 118, sales: 10620, station: 'Tandoor' },
-    { name: 'Doodh Patti Karak Chai', urdu: 'دودھ پتی کڑک چائے', count: 85, sales: 11900, station: 'Chai' }
+  // Dynamically aggregated top selling items
+  const dishSalesMap = {};
+  completedOrders.forEach(o => {
+    (o.items || []).forEach(item => {
+      const key = item.name;
+      if (!dishSalesMap[key]) {
+        dishSalesMap[key] = {
+          name: item.name,
+          urdu: item.urduName || '',
+          count: 0,
+          sales: 0,
+          station: item.station || 'Kitchen'
+        };
+      }
+      dishSalesMap[key].count += item.weightKg ? Number(item.weightKg) : Number(item.quantity);
+      dishSalesMap[key].sales += Number(item.totalPrice || 0);
+    });
+  });
+
+  const computedTopDishes = Object.values(dishSalesMap).sort((a, b) => b.sales - a.sales);
+  const topDishes = computedTopDishes.length > 0 ? computedTopDishes : [
+    { name: 'Quarter Chicken Broast', urdu: 'کوآرٹر چکن بروسٹ', count: 0, sales: 0, station: 'Fryer' },
+    { name: 'Special Beef Nalli Biryani', urdu: 'اسپیشل بیف نلی بریانی', count: 0, sales: 0, station: 'Daigh' }
   ];
 
   // Inventory & Daigh Status
   const daighItems = menuItems.filter(i => i.isDaighItem);
   const rawMeats = [
-    { name: 'Broiler Chicken', stock: '83.95 kg', min: '20 kg', health: 'healthy' },
+    { name: 'Broiler Chicken', stock: '85.00 kg', min: '20 kg', health: 'healthy' },
     { name: 'Shinwari Mutton Cuts', stock: '42.00 kg', min: '10 kg', health: 'healthy' },
     { name: 'Fresh Surmai Fish', stock: '28.50 kg', min: '8 kg', health: 'healthy' },
-    { name: 'Banaspati Ghee', stock: '119.88 L', min: '25 L', health: 'healthy' }
+    { name: 'Banaspati Ghee', stock: '120.00 L', min: '25 L', health: 'healthy' }
   ];
 
-  // Anti-Theft Void Audit Log entries
-  const voidLogs = [
-    {
-      id: 'v1',
-      token: 'TKN-102',
-      amount: 1360,
-      manager: 'Shahmeer Khan (General Manager)',
-      reason: 'Customer changed mind to Beef Karahi, approved by manager',
-      time: '10:48 PM',
-      severity: 'approved'
-    },
-    {
-      id: 'v2',
-      token: 'TKN-089',
-      amount: 520,
-      manager: 'Tariq Mehmood (Shift Supervisor)',
-      reason: 'Biryani plate cold complain, replaced free of cost',
-      time: '09:22 PM',
-      severity: 'approved'
-    }
-  ];
+  // Anti-Theft Void Audit Log entries from actual voided orders
+  const voidLogs = voidedOrders.map((vo, i) => ({
+    id: vo.id || `v-${i}`,
+    token: `TKN-${String(vo.token || i + 1).padStart(3, '0')}`,
+    amount: vo.total || 0,
+    manager: vo.voidedBy || 'Authorized Manager',
+    reason: vo.voidReason || 'Order voided under supervisor review',
+    time: new Date(vo.voidedAt || vo.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    severity: 'approved'
+  }));
 
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--bg-app)', overflow: 'hidden' }}>

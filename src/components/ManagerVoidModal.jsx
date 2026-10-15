@@ -64,7 +64,7 @@ export function ManagerVoidModal({ orders, onVoidSuccess, onClose }) {
 
         <div className="modal-body">
           <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', padding: '10px 14px', borderRadius: '8px', fontSize: '12px', color: '#fca5a5', marginBottom: '14px' }}>
-            🔒 <strong>Automation 3 Rule:</strong> Cashiers cannot delete or cancel any generated token/bill without a verified 4-digit Manager PIN (Demo PINs: <strong>7860</strong> or <strong>1234</strong>).
+            🔒 <strong>Anti-Theft Void Guard:</strong> Bill cancellation strictly requires verification with an authorized 4-digit Manager or Supervisor Security PIN. Every void attempt is recorded in the immutable audit log.
           </div>
 
           {/* Select Order to Void */}

@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Printer, CheckCircle2, X, Send, Copy, Check, MessageSquare } from 'lucide-react';
 import { getWhatsAppReceiptUrl, generateWhatsAppReceiptText } from '../utils/whatsappReceipt';
 
-export function ThermalReceiptModal({ order, onClose }) {
+export function ThermalReceiptModal({ order, onClose, isReprint = false }) {
   const [customerPhone, setCustomerPhone] = useState(order?.customerPhone || '0300');
   const [copied, setCopied] = useState(false);
+  const [paperWidth, setPaperWidth] = useState('80mm'); // '80mm' | '58mm'
 
   if (!order) return null;
 
@@ -35,15 +36,56 @@ export function ThermalReceiptModal({ order, onClose }) {
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-window" onClick={e => e.stopPropagation()} style={{ maxWidth: '460px' }}>
+      <div className="modal-window" onClick={e => e.stopPropagation()} style={{ maxWidth: paperWidth === '58mm' ? '380px' : '460px' }}>
         <div className="modal-header">
-          <h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <CheckCircle2 size={20} color="#10b981" />
-            Order #{order.token} Paid & Confirmed
-          </h3>
-          <button type="button" className="modal-close-btn" onClick={onClose}>
-            <X size={18} />
-          </button>
+            <h3 style={{ margin: 0 }}>
+              Order #{order.token} {isReprint ? '(Reprint)' : 'Paid'}
+            </h3>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {/* 80mm vs 58mm Paper Toggle */}
+            <div style={{ display: 'flex', background: '#090d16', padding: '2px', borderRadius: '6px', border: '1px solid var(--border-subtle)' }}>
+              <button
+                type="button"
+                onClick={() => setPaperWidth('80mm')}
+                style={{
+                  padding: '3px 8px',
+                  borderRadius: '4px',
+                  background: paperWidth === '80mm' ? '#10b981' : 'transparent',
+                  color: paperWidth === '80mm' ? '#fff' : 'var(--text-muted)',
+                  border: 'none',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                80mm
+              </button>
+              <button
+                type="button"
+                onClick={() => setPaperWidth('58mm')}
+                style={{
+                  padding: '3px 8px',
+                  borderRadius: '4px',
+                  background: paperWidth === '58mm' ? '#10b981' : 'transparent',
+                  color: paperWidth === '58mm' ? '#fff' : 'var(--text-muted)',
+                  border: 'none',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                58mm
+              </button>
+            </div>
+
+            <button type="button" className="modal-close-btn" onClick={onClose}>
+              <X size={18} />
+            </button>
+          </div>
         </div>
 
         <div className="modal-body" style={{ maxHeight: '78vh', overflowY: 'auto' }}>
@@ -130,11 +172,24 @@ export function ThermalReceiptModal({ order, onClose }) {
           </div>
 
           {/* =================================================================== */}
-          {/* PRINTABLE 80MM THERMAL RECEIPT                                      */}
+          {/* PRINTABLE THERMAL RECEIPT (80MM / 58MM ADAPTIVE)                     */}
           {/* =================================================================== */}
-          <div className="thermal-receipt-container print-only-area">
+          <div
+            className="thermal-receipt-container print-only-area"
+            style={{
+              maxWidth: paperWidth === '58mm' ? '270px' : '360px',
+              margin: '0 auto',
+              fontSize: paperWidth === '58mm' ? '11px' : '12px'
+            }}
+          >
+            {isReprint && (
+              <div style={{ border: '2px dashed #000', padding: '4px', margin: '6px 0', textAlign: 'center', fontWeight: 900, fontSize: '11px' }}>
+                *** REPRINT / DUPLICATE COPY ***
+              </div>
+            )}
+
             {/* Header */}
-            <div className="thermal-center thermal-bold" style={{ fontSize: '15px' }}>
+            <div className="thermal-center thermal-bold" style={{ fontSize: paperWidth === '58mm' ? '13px' : '15px' }}>
               🔥 KARACHI SHINWARI & BROAST
             </div>
             <div className="thermal-center" style={{ fontSize: '10px' }}>
@@ -149,7 +204,7 @@ export function ThermalReceiptModal({ order, onClose }) {
 
             {/* Giant Token Box */}
             <div className="thermal-token-box">
-              TOKEN #{order.token.toString().padStart(3, '0')}
+              TOKEN #{String(order.token).padStart(3, '0')}
             </div>
 
             {/* Order Meta */}

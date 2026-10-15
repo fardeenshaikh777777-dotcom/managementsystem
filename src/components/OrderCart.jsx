@@ -3,24 +3,38 @@ import { Trash2, Plus, Minus, UtensilsCrossed, ShoppingBag, Car, Bike, Edit3 } f
 import { RIDERS_LIST } from '../data/mockData';
 
 export function OrderCart({
-  orderMode,
+  orderMode = 'takeaway',
   setOrderMode,
+  onChangeOrderMode,
+  dailyToken,
   tokenNumber,
   tableNumber,
   setTableNumber,
+  onChangeTableNumber,
   carDetails,
   setCarDetails,
+  onChangeCarDetails,
   deliveryInfo,
   setDeliveryInfo,
-  cartItems,
+  onChangeDeliveryInfo,
+  cartItems = [],
   onUpdateQty,
   onRemoveItem,
   onOpenWeightModalForEdit,
   onClearCart,
-  srbTaxRate,
+  srbTaxRate = 0,
   setSrbTaxRate,
-  onInitiateCheckout
+  onChangeTaxRate,
+  onInitiateCheckout,
+  onResetDemo
 }) {
+  const modeSetter = setOrderMode || onChangeOrderMode || (() => {});
+  const activeToken = tokenNumber || dailyToken || 1;
+  const tableSetter = setTableNumber || onChangeTableNumber || (() => {});
+  const carSetter = setCarDetails || onChangeCarDetails || (() => {});
+  const deliverySetter = setDeliveryInfo || onChangeDeliveryInfo || (() => {});
+  const taxSetter = setSrbTaxRate || onChangeTaxRate || (() => {});
+
   // Calculations
   const subtotal = cartItems.reduce((acc, item) => acc + item.totalPrice, 0);
   const tax = Math.round((subtotal * srbTaxRate) / 100);
@@ -34,7 +48,7 @@ export function OrderCart({
           <button
             type="button"
             className={`mode-btn ${orderMode === 'dine_in' ? 'active' : ''}`}
-            onClick={() => setOrderMode('dine_in')}
+            onClick={() => modeSetter('dine_in')}
           >
             <UtensilsCrossed size={16} />
             <span>Dine-In</span>
@@ -43,7 +57,7 @@ export function OrderCart({
           <button
             type="button"
             className={`mode-btn ${orderMode === 'takeaway' ? 'active takeaway' : ''}`}
-            onClick={() => setOrderMode('takeaway')}
+            onClick={() => modeSetter('takeaway')}
           >
             <ShoppingBag size={16} />
             <span>Takeaway</span>
@@ -52,7 +66,7 @@ export function OrderCart({
           <button
             type="button"
             className={`mode-btn ${orderMode === 'car_dine' ? 'active car-dine' : ''}`}
-            onClick={() => setOrderMode('car_dine')}
+            onClick={() => modeSetter('car_dine')}
           >
             <Car size={16} />
             <span>Car-Dine</span>
@@ -61,7 +75,7 @@ export function OrderCart({
           <button
             type="button"
             className={`mode-btn ${orderMode === 'delivery' ? 'active' : ''}`}
-            onClick={() => setOrderMode('delivery')}
+            onClick={() => modeSetter('delivery')}
           >
             <Bike size={16} />
             <span>Delivery</span>
@@ -71,7 +85,7 @@ export function OrderCart({
         {/* Dynamic Mode Metadata Input Row */}
         <div className="mode-meta-row">
           <span className="token-pill-badge" title="Daily token sequence starting from #1 each morning">
-            #{tokenNumber.toString().padStart(3, '0')}
+            #{String(activeToken).padStart(3, '0')}
           </span>
 
           {orderMode === 'dine_in' && (
@@ -80,7 +94,7 @@ export function OrderCart({
               className="mode-input-field"
               placeholder="Table No (e.g., T-04 or Family Hall)"
               value={tableNumber}
-              onChange={e => setTableNumber(e.target.value)}
+              onChange={e => tableSetter(e.target.value)}
             />
           )}
 
@@ -96,7 +110,7 @@ export function OrderCart({
               className="mode-input-field"
               placeholder="Car / Bike No & Model (e.g. LEA-4921 Corolla White)"
               value={carDetails}
-              onChange={e => setCarDetails(e.target.value)}
+              onChange={e => carSetter(e.target.value)}
             />
           )}
 
@@ -104,8 +118,8 @@ export function OrderCart({
             <select
               className="mode-input-field"
               style={{ background: 'var(--bg-surface-elevated)', color: '#fff', padding: '4px' }}
-              value={deliveryInfo.riderId || ''}
-              onChange={e => setDeliveryInfo({ ...deliveryInfo, riderId: e.target.value })}
+              value={deliveryInfo?.riderId || ''}
+              onChange={e => deliverySetter({ ...deliveryInfo, riderId: e.target.value })}
             >
               <option value="">Select Delivery Rider...</option>
               {RIDERS_LIST.map(r => (
@@ -258,8 +272,8 @@ export function OrderCart({
           </button>
         </div>
 
-        {cartItems.length > 0 && (
-          <div style={{ textAlign: 'center', marginTop: '8px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '8px' }}>
+          {cartItems.length > 0 && (
             <button
               type="button"
               onClick={onClearCart}
@@ -268,13 +282,33 @@ export function OrderCart({
                 color: 'var(--text-dim)',
                 fontSize: '11px',
                 fontWeight: 600,
-                textDecoration: 'underline'
+                textDecoration: 'underline',
+                border: 'none',
+                cursor: 'pointer'
               }}
             >
               Clear Current Bill
             </button>
-          </div>
-        )}
+          )}
+
+          {onResetDemo && (
+            <button
+              type="button"
+              onClick={onResetDemo}
+              style={{
+                background: 'transparent',
+                color: '#64748b',
+                fontSize: '11px',
+                fontWeight: 600,
+                border: 'none',
+                cursor: 'pointer'
+              }}
+              title="Reset orders and cash drawers for a clean client demo"
+            >
+              🔄 Reset Demo Data
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

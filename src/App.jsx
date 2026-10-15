@@ -14,19 +14,23 @@ import { BlindCashScreen } from './components/BlindCashScreen';
 import { OwnerDashboardView } from './components/OwnerDashboardView';
 import { INITIAL_MENU_ITEMS } from './data/mockData';
 import {
+  submitAuthoritativeOrder,
+  getAllStoredOrders,
+  getOrCreateActiveShiftSession,
+  getPendingOutboxCount,
+  processOutboxSync,
   getNextDailyTokenNumber,
-  getCurrentTokenNumber,
-  getOfflineQueue,
-  saveOrderToOfflineQueue,
-  syncOfflineQueueToSupabase,
-  getActiveShiftSession,
-  getSavedOrders,
-  saveOrderRecord
+  getCurrentTokenNumber
 } from './services/posService';
+import { getActiveUser, setActiveUser, ROLES } from './services/authService';
+import { idbClear } from './services/db';
 
 export default function App() {
   // Active Navigation View: 'pos', 'riders', 'blind_cash', 'owner'
   const [activeView, setActiveView] = useState('pos');
+
+  // RBAC User Session State
+  const [currentUser, setCurrentUser] = useState(getActiveUser);
 
   // Menu State with Real-Time Inventory & Daigh Alert Monitoring
   const [activeCategory, setActiveCategory] = useState('all');
@@ -47,12 +51,12 @@ export default function App() {
   });
 
   // Shift & Network / Load-Shedding State
-  const [activeShift, setActiveShift] = useState(getActiveShiftSession);
+  const [activeShift, setActiveShift] = useState(null);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [isSimulatedOffline, setIsSimulatedOffline] = useState(false);
-  const [pendingSyncCount, setPendingSyncCount] = useState(() => getOfflineQueue().length);
+  const [pendingSyncCount, setPendingSyncCount] = useState(0);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [placedOrders, setPlacedOrders] = useState(getSavedOrders);
+  const [placedOrders, setPlacedOrders] = useState([]);
 
   // Modals State
   const [weightModalData, setWeightModalData] = useState(null); // { item, cartIndex }
@@ -61,6 +65,48 @@ export default function App() {
   const [receiptOrder, setReceiptOrder] = useState(null);
   const [isVoidModalOpen, setIsVoidModalOpen] = useState(false);
   const [isShiftCloseModalOpen, setIsShiftCloseModalOpen] = useState(false);
+
+  // Check if live remote Supabase is configured
+  const isRemoteConfigured = typeof import.meta !== 'undefined' && 
+    import.meta.env?.VITE_SUPABASE_URL && 
+    !import.meta.env.VITE_SUPABASE_URL.includes('demo');
+
+  // Load Initial Data from IndexedDB
+  useEffect(() => {
+    async function initDB() {
+      try {
+        const shift = await getOrCreateActiveShiftSession();
+        setActiveShift(shift);
+
+        const orders = await getAllStoredOrders();
+        setPlacedOrders(orders);
+
+        const pCount = await getPendingOutboxCount();
+        setPendingSyncCount(pCount);
+      } catch (err) {
+        console.warn('Initialization error from IndexedDB:', err);
+      }
+    }
+    initDB();
+
+    // Periodic background sync engine (runs every 15s)
+    const syncInterval = setInterval(() => {
+      if (navigator.onLine && !isSimulatedOffline) {
+        processOutboxSync()
+          .then(async (res) => {
+            const p = await getPendingOutboxCount();
+            setPendingSyncCount(p);
+            if (res.syncedCount > 0) {
+              const updated = await getAllStoredOrders();
+              setPlacedOrders(updated);
+            }
+          })
+          .catch(() => {});
+      }
+    }, 15000);
+
+    return () => clearInterval(syncInterval);
+  }, [isSimulatedOffline]);
 
   // Network Connectivity Listeners for Automatic Load-Shedding Sync
   useEffect(() => {
@@ -85,6 +131,10 @@ export default function App() {
   // Global Keyboard Shortcuts (F1: Cash, F2: Card, F3: COD, F4: Void, F8: Shift Close)
   useEffect(() => {
     function handleGlobalKeys(e) {
+      if (isPaymentModalOpen || isVoidModalOpen || weightModalData) {
+        return; // Modal is handling focus
+      }
+
       if (e.key === 'F1') {
         e.preventDefault();
         if (cartItems.length > 0) initiateCheckout('cash');
@@ -104,12 +154,12 @@ export default function App() {
     }
     window.addEventListener('keydown', handleGlobalKeys);
     return () => window.removeEventListener('keydown', handleGlobalKeys);
-  }, [cartItems]);
+  }, [cartItems, isPaymentModalOpen, isVoidModalOpen, weightModalData]);
 
   // Handle Item Click from 65% Touch Grid
   function handleSelectItem(item) {
     if (item.pricingType === 'per_kg') {
-      // Variable-weight item: Open Live Weight Calculator Modal!
+      // Variable-weight item: Open Live Weight Calculator Modal
       setWeightModalData({ item, cartIndex: null });
     } else {
       // Fixed-price item: Add to active bill instantly with ZERO LAG
@@ -200,84 +250,69 @@ export default function App() {
     setIsPaymentModalOpen(true);
   }
 
-  // Complete Payment & Generate 80mm Receipt / WhatsApp Link
-  function handleCompletePayment({ method, tendered, change }) {
-    const subtotal = cartItems.reduce((acc, i) => acc + i.totalPrice, 0);
-    const tax = Math.round((subtotal * srbTaxRate) / 100);
-    const total = subtotal + tax;
+  // Authoritative Order Submission Workflow (Priority 1)
+  async function handleCompletePayment({ method, tendered, change }) {
+    try {
+      const newOrder = await submitAuthoritativeOrder({
+        cartItems,
+        orderMode,
+        tableNumber: orderMode === 'dine_in' ? tableNumber : null,
+        carDetails: orderMode === 'car_dine' ? carDetails : null,
+        deliveryInfo: orderMode === 'delivery' ? deliveryInfo : null,
+        paymentMethod: method,
+        tendered,
+        change,
+        taxRatePercent: srbTaxRate
+      });
 
-    const newOrder = {
-      id: 'ord-' + Date.now(),
-      token: dailyToken,
-      mode: orderMode,
-      tableNo: orderMode === 'dine_in' ? tableNumber : null,
-      carDetails: orderMode === 'car_dine' ? carDetails : null,
-      deliveryInfo: orderMode === 'delivery' ? deliveryInfo : null,
-      items: [...cartItems],
-      subtotal,
-      tax,
-      total,
-      paymentMethod: method,
-      tendered,
-      change,
-      status: 'completed',
-      createdAt: new Date().toISOString()
-    };
+      // Update state
+      setPlacedOrders(prev => [newOrder, ...prev]);
 
-    // Save order record
-    saveOrderRecord(newOrder);
-    setPlacedOrders(prev => [newOrder, ...prev]);
+      // Reactive update for Daigh plate stock countdown (< 5 plates alert)
+      setMenuItems(prev =>
+        prev.map(item => {
+          const cartItemMatch = cartItems.find(c => c.id === item.id);
+          if (cartItemMatch && item.isDaighItem && item.daighPlatesRemaining !== undefined) {
+            const newRemaining = Math.max(0, item.daighPlatesRemaining - cartItemMatch.quantity);
+            const isNowLow = newRemaining < (item.lowStockThreshold || 5);
+            return {
+              ...item,
+              daighPlatesRemaining: newRemaining,
+              isLowStock: isNowLow
+            };
+          }
+          return item;
+        })
+      );
 
-    // =========================================================================
-    // AUTOMATION 1: RECIPE INVENTORY AUTO-DEPLETION
-    // AUTOMATION 2: DAIGH LOW-STOCK MONITORING (< 5 PLATES RULE)
-    // =========================================================================
-    setMenuItems(prev =>
-      prev.map(item => {
-        // If this item was in the completed order
-        const cartItemMatch = cartItems.find(c => c.id === item.id);
-        if (cartItemMatch && item.isDaighItem && item.daighPlatesRemaining !== undefined) {
-          const newRemaining = Math.max(0, item.daighPlatesRemaining - cartItemMatch.quantity);
-          const isNowLow = newRemaining < (item.lowStockThreshold || 5);
-          return {
-            ...item,
-            daighPlatesRemaining: newRemaining,
-            isLowStock: isNowLow
-          };
-        }
-        return item;
-      })
-    );
+      // Refresh outbox badge
+      const pCount = await getPendingOutboxCount();
+      setPendingSyncCount(pCount);
 
-    // =========================================================================
-    // LOAD-SHEDDING & OFFLINE AUTOMATION:
-    // If offline or simulated, enqueue to browser storage; otherwise push
-    // =========================================================================
-    if (!isOnline || isSimulatedOffline) {
-      const qLen = saveOrderToOfflineQueue(newOrder);
-      setPendingSyncCount(qLen);
+      // Open receipt modal
+      setReceiptOrder(newOrder);
+      setIsPaymentModalOpen(false);
+
+      // Advance daily token for the next bill
+      setDailyToken(newOrder.token + 1);
+
+      // Clear active bill
+      setCartItems([]);
+    } catch (err) {
+      alert(`Order submission error: ${err.message}`);
     }
-
-    // Set thermal receipt preview
-    setReceiptOrder(newOrder);
-    setIsPaymentModalOpen(false);
-
-    // Advance daily token for the next bill
-    const nextTkn = getNextDailyTokenNumber();
-    setDailyToken(nextTkn);
-
-    // Clear active bill
-    setCartItems([]);
   }
 
   // Trigger Background Sync to Supabase
   async function triggerAutoSync() {
     setIsSyncing(true);
     try {
-      const res = await syncOfflineQueueToSupabase();
-      setPendingSyncCount(getOfflineQueue().length);
+      const res = await processOutboxSync();
+      const pCount = await getPendingOutboxCount();
+      setPendingSyncCount(pCount);
       if (res.syncedCount > 0) {
-        console.log(`Successfully synced ${res.syncedCount} queued orders to Supabase.`);
+        const updated = await getAllStoredOrders();
+        setPlacedOrders(updated);
       }
     } catch (e) {
       console.warn('Sync attempt encountered an error:', e);
@@ -293,6 +328,26 @@ export default function App() {
     );
   }
 
+  // Handle Role Switching for demonstration (Priority 0)
+  function handleChangeRole(user) {
+    setCurrentUser(user);
+    setActiveUser(user);
+  }
+
+  // Reset Demo Data
+  async function handleResetDemoData() {
+    if (!confirm('Are you sure you want to reset demo orders and return to clean initial state?')) {
+      return;
+    }
+    await idbClear('orders');
+    await idbClear('outbox');
+    await idbClear('cash_movements');
+    setPlacedOrders([]);
+    setPendingSyncCount(0);
+    setMenuItems(INITIAL_MENU_ITEMS);
+    alert('Demo environment successfully reset to pristine initial state.');
+  }
+
   // Filter items by active category
   const filteredCategoryItems = menuItems.filter(item => {
     if (activeCategory === 'all') return true;
@@ -301,7 +356,7 @@ export default function App() {
 
   return (
     <div className="pos-container">
-      {/* 1. Top Header Bar with View Switcher, Network Status, Shift, and Shortcut Buttons */}
+      {/* 1. Top Header Bar with View Switcher, Network Status, Role Switcher, and Shortcuts */}
       <HeaderBar
         isOnline={isOnline}
         isSimulatedOffline={isSimulatedOffline}
@@ -314,55 +369,58 @@ export default function App() {
         onSelectView={setActiveView}
         onOpenVoidModal={() => setIsVoidModalOpen(true)}
         onOpenShiftCloseModal={() => setActiveView('blind_cash')}
+        currentUser={currentUser}
+        onChangeRole={handleChangeRole}
+        isRemoteConfigured={isRemoteConfigured}
       />
 
       {/* 2. Automation 2: Live Daigh Alert Banner (Fires when < 5 plates remaining) */}
       <DaighAlertBanner menuItems={menuItems} />
 
-      {/* 3. Conditional View Router */}
+      {/* 3. Main Operational Screens */}
       {activeView === 'pos' && (
-        <main className="pos-main-body">
-          {/* Left 65%: Fast Touch Menu Grid */}
-          <section className="pos-menu-section" aria-label="Touch Menu Selection">
-            {/* Category Tabs: Broast, Burgers, Biryani, Karahi, BBQ, Tandoor, Chai */}
+        <main className="pos-body">
+          {/* Left 65%: Fast Touch Screen Menu Grid */}
+          <section className="pos-menu-panel">
             <CategoryNav
+              categories={INITIAL_MENU_ITEMS}
               activeCategory={activeCategory}
               onSelectCategory={setActiveCategory}
             />
 
-            {/* Touch Item Cards */}
             <ItemGrid
               items={filteredCategoryItems}
               onSelectItem={handleSelectItem}
+              onOpenWeightModal={handleOpenWeightModalForEdit}
             />
           </section>
 
-          {/* Right 35%: Active Bill, Modes, Car-Dine & 1-Click Checkout */}
-          <section className="pos-cart-section" aria-label="Active Bill and Checkout">
+          {/* Right 35%: Active Bill, Mode Toggles, & Tender Controls */}
+          <section className="pos-cart-panel">
             <OrderCart
+              dailyToken={dailyToken}
               orderMode={orderMode}
-              setOrderMode={setOrderMode}
-              tokenNumber={dailyToken}
+              onChangeOrderMode={setOrderMode}
               tableNumber={tableNumber}
-              setTableNumber={setTableNumber}
+              onChangeTableNumber={setTableNumber}
               carDetails={carDetails}
-              setCarDetails={setCarDetails}
+              onChangeCarDetails={setCarDetails}
               deliveryInfo={deliveryInfo}
-              setDeliveryInfo={setDeliveryInfo}
+              onChangeDeliveryInfo={setDeliveryInfo}
               cartItems={cartItems}
               onUpdateQty={handleUpdateCartQty}
               onRemoveItem={handleRemoveCartItem}
-              onOpenWeightModalForEdit={handleOpenWeightModalForEdit}
-              onClearCart={() => setCartItems([])}
               srbTaxRate={srbTaxRate}
-              setSrbTaxRate={setSrbTaxRate}
+              onChangeTaxRate={setSrbTaxRate}
               onInitiateCheckout={initiateCheckout}
+              onOpenVoidModal={() => setIsVoidModalOpen(true)}
+              onResetDemo={handleResetDemoData}
             />
           </section>
         </main>
       )}
 
-      {/* View 2: In-House Delivery Rider Tracker & Cash Ledger */}
+      {/* View 2: In-House Rider Tracker & COD Ledger */}
       {activeView === 'riders' && (
         <RiderTrackerView
           orders={placedOrders}
@@ -370,11 +428,13 @@ export default function App() {
         />
       )}
 
-      {/* View 3: Dedicated Blind Cash Drawer Closing Screen */}
+      {/* View 3: Dedicated Blind Cash Closing Screen */}
       {activeView === 'blind_cash' && (
         <BlindCashScreen
           activeShift={activeShift}
-          onShiftClosed={report => setActiveShift(prev => ({ ...prev, ...report }))}
+          onShiftClosed={(res) => {
+            setActiveShift(prev => ({ ...prev, status: 'closed', ...res }));
+          }}
           onSwitchToPos={() => setActiveView('pos')}
         />
       )}
@@ -389,30 +449,23 @@ export default function App() {
       )}
 
       {/* ===================================================================== */}
-      {/* Interactive Modals                                                    */}
+      {/* MODALS SECTION                                                        */}
       {/* ===================================================================== */}
 
-      {/* Live Weight Scale Calculator Modal */}
+      {/* Variable Weight Keypad Calculator Modal */}
       {weightModalData && (
         <WeightCalculatorModal
           item={weightModalData.item}
-          initialWeight={
-            weightModalData.cartIndex !== null
-              ? cartItems[weightModalData.cartIndex]?.weightKg
-              : 1.0
-          }
+          initialWeight={weightModalData.cartIndex !== null ? cartItems[weightModalData.cartIndex]?.weightKg : 1.0}
           onConfirm={handleConfirmWeight}
           onClose={() => setWeightModalData(null)}
         />
       )}
 
-      {/* 1-Click Checkout & Pakistani Cash Tender Modal */}
+      {/* Payment & Tender Modal */}
       {isPaymentModalOpen && (
         <PaymentModal
-          totalAmount={
-            cartItems.reduce((acc, i) => acc + i.totalPrice, 0) +
-            Math.round((cartItems.reduce((acc, i) => acc + i.totalPrice, 0) * srbTaxRate) / 100)
-          }
+          totalAmount={cartItems.reduce((acc, i) => acc + i.totalPrice, 0) + Math.round((cartItems.reduce((acc, i) => acc + i.totalPrice, 0) * srbTaxRate) / 100)}
           initialMethod={checkoutInitialMethod}
           tokenNumber={dailyToken}
           onCompletePayment={handleCompletePayment}
@@ -420,7 +473,7 @@ export default function App() {
         />
       )}
 
-      {/* 80mm Thermal Receipt Preview & WhatsApp Automation */}
+      {/* Thermal 80mm Printable Receipt & WhatsApp Modal */}
       {receiptOrder && (
         <ThermalReceiptModal
           order={receiptOrder}
@@ -428,7 +481,7 @@ export default function App() {
         />
       )}
 
-      {/* Automation 3: Anti-Theft Void Guard Modal (4-digit Manager PIN) */}
+      {/* Anti-Theft Void Guard Modal (4-Digit Manager PIN Guard) */}
       {isVoidModalOpen && (
         <ManagerVoidModal
           orders={placedOrders.filter(o => o.status !== 'cancelled')}
@@ -437,12 +490,16 @@ export default function App() {
         />
       )}
 
-      {/* Automation 4: Quick Blind Cash Shift Closing Modal (Shortcut F8 from POS) */}
+      {/* Shift Close Confirmation Modal */}
       {isShiftCloseModalOpen && (
         <BlindCashCloseModal
           activeShift={activeShift}
-          onShiftClosed={report => setActiveShift(prev => ({ ...prev, ...report }))}
+          orders={placedOrders}
           onClose={() => setIsShiftCloseModalOpen(false)}
+          onConfirmClose={() => {
+            setIsShiftCloseModalOpen(false);
+            setActiveView('blind_cash');
+          }}
         />
       )}
     </div>
