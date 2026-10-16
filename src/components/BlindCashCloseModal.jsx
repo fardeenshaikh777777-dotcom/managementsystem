@@ -118,7 +118,7 @@ export function BlindCashCloseModal({ activeShift, onShiftClosed, onClose, curre
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '190px' }}>
                         <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: d.color }} />
-                        <span style={{ fontSize: '12px', fontWeight: 700, color: '#fff' }}>{d.label}</span>
+                        <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-main)' }}>{d.label}</span>
                       </div>
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -132,9 +132,9 @@ export function BlindCashCloseModal({ activeShift, onShiftClosed, onClose, curre
                             width: '80px',
                             padding: '6px 8px',
                             borderRadius: '6px',
-                            background: '#04070e',
+                            background: 'var(--bg-surface)',
                             border: '1px solid var(--border-medium)',
-                            color: '#fff',
+                            color: 'var(--text-main)',
                             fontFamily: 'var(--font-display)',
                             fontSize: '14px',
                             fontWeight: 700,
@@ -153,7 +153,7 @@ export function BlindCashCloseModal({ activeShift, onShiftClosed, onClose, curre
               {/* Counted Total Banner */}
               <div
                 style={{
-                  background: '#04070e',
+                  background: 'var(--bg-surface-elevated)',
                   border: '2px solid var(--border-accent)',
                   borderRadius: '12px',
                   padding: '14px',
@@ -232,7 +232,7 @@ export function BlindCashCloseModal({ activeShift, onShiftClosed, onClose, curre
                 )}
               </div>
 
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 900, color: '#fff', marginBottom: '6px' }}>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 900, color: 'var(--text-main)', marginBottom: '6px' }}>
                 Shift #{closingReport.sessionNumber || 104} Closed & Locked
               </h2>
               <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '18px' }}>
@@ -242,8 +242,8 @@ export function BlindCashCloseModal({ activeShift, onShiftClosed, onClose, curre
               {/* Breakdown Table */}
               <div
                 style={{
-                  background: '#04070e',
-                  border: '1px solid var(--border-medium)',
+                  background: 'var(--bg-surface-elevated)',
+                  border: '1px solid var(--border-subtle)',
                   borderRadius: '12px',
                   padding: '16px',
                   textAlign: 'left',
@@ -254,19 +254,19 @@ export function BlindCashCloseModal({ activeShift, onShiftClosed, onClose, curre
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted)' }}>
                   <span>Opening Cash Float:</span>
-                  <span style={{ fontWeight: 700, color: '#fff' }}>{currency} {closingReport.openingCash?.toLocaleString()}</span>
+                  <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>{currency} {closingReport.openingCash?.toLocaleString()}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted)' }}>
                   <span>System Paid Cash Sales:</span>
-                  <span style={{ fontWeight: 700, color: '#fff' }}>{currency} {closingReport.cashSalesTotal?.toLocaleString()}</span>
+                  <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>{currency} {closingReport.cashSalesTotal?.toLocaleString()}</span>
                 </div>
                 <div style={{ borderTop: '1px dashed var(--border-medium)', paddingTop: '6px', display: 'flex', justifyContent: 'space-between', fontSize: '14px', fontWeight: 700 }}>
                   <span>Calculated Expected Cash:</span>
-                  <span style={{ color: '#38bdf8' }}>{currency} {closingReport.expectedCashTotal?.toLocaleString()}</span>
+                  <span style={{ color: 'var(--color-blue, #2563eb)' }}>{currency} {closingReport.expectedCashTotal?.toLocaleString()}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', fontWeight: 700 }}>
                   <span>Your Counted Physical Cash:</span>
-                  <span style={{ color: '#10b981' }}>{currency} {closingReport.physicalCashTotal?.toLocaleString()}</span>
+                  <span style={{ color: 'var(--color-emerald, #059669)' }}>{currency} {closingReport.physicalCashTotal?.toLocaleString()}</span>
                 </div>
 
                 <div

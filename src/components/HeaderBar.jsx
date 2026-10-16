@@ -55,25 +55,36 @@ export function HeaderBar({
     return () => clearInterval(timer);
   }, []);
 
-  // High-Contrast Theme Toggle
-  const [isHighContrast, setIsHighContrast] = useState(() => {
+  // Modern Light / Moderate Theme is default. Night Shift toggle switches to dark theme.
+  const [isDarkMode, setIsDarkMode] = useState(() => {
     if (typeof localStorage !== 'undefined') {
-      return localStorage.getItem('pos_high_contrast') === 'true';
+      return localStorage.getItem('pos_dark_theme') === 'true';
     }
-    return false;
+    return false; // Default: Modern light/moderate!
   });
 
-  function handleToggleContrast() {
-    setIsHighContrast(prev => {
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const savedDark = localStorage.getItem('pos_dark_theme') === 'true';
+      if (savedDark) {
+        document.documentElement.classList.add('pos-dark-theme');
+      } else {
+        document.documentElement.classList.remove('pos-dark-theme');
+      }
+    }
+  }, []);
+
+  function handleToggleTheme() {
+    setIsDarkMode(prev => {
       const next = !prev;
       if (typeof localStorage !== 'undefined') {
-        localStorage.setItem('pos_high_contrast', String(next));
+        localStorage.setItem('pos_dark_theme', String(next));
       }
       if (typeof document !== 'undefined') {
         if (next) {
-          document.documentElement.classList.add('pos-high-contrast');
+          document.documentElement.classList.add('pos-dark-theme');
         } else {
-          document.documentElement.classList.remove('pos-high-contrast');
+          document.documentElement.classList.remove('pos-dark-theme');
         }
       }
       return next;
@@ -173,14 +184,14 @@ export function HeaderBar({
           <span>{currentTime}</span>
         </div>
 
-        {/* Theme Contrast Toggle */}
+        {/* Theme Mode Toggle (Modern Light/Moderate vs Night Shift Dark) */}
         <button
           type="button"
-          onClick={handleToggleContrast}
+          onClick={handleToggleTheme}
           className="pos-header-icon-btn"
-          title={isHighContrast ? 'Switch to Standard Theme' : 'Switch to High-Contrast OLED Theme'}
+          title={isDarkMode ? 'Switch to Modern Light/Moderate Mode' : 'Switch to Dark Mode'}
         >
-          {isHighContrast ? <Sun size={14} color="#fbbf24" /> : <Moon size={14} />}
+          {isDarkMode ? <Sun size={15} color="#d97706" /> : <Moon size={15} />}
         </button>
 
         {/* User Role Menu */}

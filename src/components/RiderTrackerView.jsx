@@ -111,8 +111,8 @@ export function RiderTrackerView({ orders, onUpdateOrders, currency = BRAND.curr
       <div style={{ background: 'var(--bg-surface)', borderBottom: '1px solid var(--border-subtle)', padding: '16px 20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
           <div>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Bike size={22} color="#f59e0b" />
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Bike size={22} color="var(--color-brand-primary)" />
               In-House Delivery Rider Tracker & Cash Ledger
             </h2>
             <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
@@ -127,8 +127,8 @@ export function RiderTrackerView({ orders, onUpdateOrders, currency = BRAND.curr
               padding: '8px 14px',
               borderRadius: '8px',
               background: 'var(--bg-surface-elevated)',
-              color: '#38bdf8',
-              border: '1px solid #0284c7',
+              color: 'var(--color-info)',
+              border: '1px solid var(--border-subtle)',
               fontWeight: 700,
               fontSize: '12px',
               display: 'flex',
@@ -147,7 +147,7 @@ export function RiderTrackerView({ orders, onUpdateOrders, currency = BRAND.curr
             <div style={{ fontSize: '11px', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700 }}>
               Total COD Cash Collected
             </div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, color: '#38bdf8' }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, color: 'var(--color-info)' }}>
               {currency} {totalFleetCollected.toLocaleString()}
             </div>
           </div>
@@ -162,7 +162,7 @@ export function RiderTrackerView({ orders, onUpdateOrders, currency = BRAND.curr
           </div>
 
           <div style={{ background: 'rgba(239, 68, 68, 0.1)', padding: '12px 16px', borderRadius: '10px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
-            <div style={{ fontSize: '11px', color: '#fca5a5', textTransform: 'uppercase', fontWeight: 700 }}>
+            <div style={{ fontSize: '11px', color: '#ef4444', textTransform: 'uppercase', fontWeight: 700 }}>
               Net Cash Owed by Riders
             </div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, color: '#ef4444' }}>
@@ -174,11 +174,11 @@ export function RiderTrackerView({ orders, onUpdateOrders, currency = BRAND.curr
 
       {/* New Rider Registration Form */}
       {showNewRiderForm && (
-        <form onSubmit={handleAddNewRider} style={{ background: '#0f172a', padding: '14px 20px', borderBottom: '1px solid #334155', display: 'flex', gap: '10px', alignItems: 'center' }}>
+        <form onSubmit={handleAddNewRider} style={{ background: 'var(--bg-surface-elevated)', padding: '14px 20px', borderBottom: '1px solid var(--border-subtle)', display: 'flex', gap: '10px', alignItems: 'center' }}>
           <input
             type="text"
             placeholder="Rider Full Name"
-            style={{ padding: '8px 12px', borderRadius: '6px', background: '#1e293b', border: '1px solid #475569', color: '#fff', fontSize: '12px' }}
+            style={{ padding: '8px 12px', borderRadius: '6px', background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', color: 'var(--text-main)', fontSize: '12px' }}
             value={newRiderName}
             onChange={e => setNewRiderName(e.target.value)}
             required
@@ -186,7 +186,7 @@ export function RiderTrackerView({ orders, onUpdateOrders, currency = BRAND.curr
           <input
             type="text"
             placeholder="Mobile No (0300...)"
-            style={{ padding: '8px 12px', borderRadius: '6px', background: '#1e293b', border: '1px solid #475569', color: '#fff', fontSize: '12px' }}
+            style={{ padding: '8px 12px', borderRadius: '6px', background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', color: 'var(--text-main)', fontSize: '12px' }}
             value={newRiderPhone}
             onChange={e => setNewRiderPhone(e.target.value)}
             required
@@ -194,13 +194,13 @@ export function RiderTrackerView({ orders, onUpdateOrders, currency = BRAND.curr
           <input
             type="text"
             placeholder="Bike Plate (e.g. KHI-8890)"
-            style={{ padding: '8px 12px', borderRadius: '6px', background: '#1e293b', border: '1px solid #475569', color: '#fff', fontSize: '12px' }}
+            style={{ padding: '8px 12px', borderRadius: '6px', background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', color: 'var(--text-main)', fontSize: '12px' }}
             value={newRiderBike}
             onChange={e => setNewRiderBike(e.target.value)}
           />
           <button
             type="submit"
-            style={{ padding: '8px 16px', borderRadius: '6px', background: '#10b981', color: '#090d16', fontWeight: 800, fontSize: '12px' }}
+            style={{ padding: '8px 16px', borderRadius: '6px', background: 'var(--color-brand-primary)', color: '#ffffff', fontWeight: 800, fontSize: '12px' }}
           >
             Save Rider
           </button>
@@ -235,7 +235,7 @@ export function RiderTrackerView({ orders, onUpdateOrders, currency = BRAND.curr
                       🛵
                     </div>
                     <div>
-                      <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '15px', color: '#fff' }}>
+                      <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '15px', color: 'var(--text-main)' }}>
                         {rider.name}
                       </div>
                       <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
@@ -251,9 +251,9 @@ export function RiderTrackerView({ orders, onUpdateOrders, currency = BRAND.curr
                       fontSize: '11px',
                       fontWeight: 700,
                       textTransform: 'uppercase',
-                      background: rider.status === 'on_delivery' ? 'rgba(245, 158, 11, 0.2)' : 'rgba(16, 185, 129, 0.2)',
-                      color: rider.status === 'on_delivery' ? '#fbbf24' : '#34d399',
-                      border: rider.status === 'on_delivery' ? '1px solid #f59e0b' : '1px solid #10b981'
+                      background: rider.status === 'on_delivery' ? 'rgba(217, 119, 6, 0.15)' : 'rgba(5, 150, 105, 0.15)',
+                      color: rider.status === 'on_delivery' ? 'var(--color-brand-primary)' : '#059669',
+                      border: rider.status === 'on_delivery' ? '1px solid var(--color-brand-primary)' : '1px solid #059669'
                     }}
                   >
                     {rider.status === 'on_delivery' ? 'On Delivery 🚀' : 'Available'}
@@ -261,27 +261,27 @@ export function RiderTrackerView({ orders, onUpdateOrders, currency = BRAND.curr
                 </div>
 
                 {/* Ledger Breakdown */}
-                <div style={{ background: '#04070e', borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '6px', margin: '12px 0' }}>
+                <div style={{ background: 'var(--bg-surface-elevated)', borderRadius: '10px', padding: '12px', display: 'flex', flexDirection: 'column', gap: '6px', margin: '12px 0', border: '1px solid var(--border-subtle)' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-muted)' }}>
                     <span>Assigned Deliveries:</span>
-                    <span style={{ fontWeight: 700, color: '#fff' }}>{metrics.assignedCount} trips</span>
+                    <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>{metrics.assignedCount} trips</span>
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-muted)' }}>
                     <span>Gross COD Cash Collected:</span>
-                    <span style={{ fontWeight: 700, color: '#38bdf8' }}>{currency} {metrics.totalCollected.toLocaleString()}</span>
+                    <span style={{ fontWeight: 700, color: 'var(--color-info)' }}>{currency} {metrics.totalCollected.toLocaleString()}</span>
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-muted)' }}>
                     <span>Cash Already Surrendered:</span>
-                    <span style={{ fontWeight: 700, color: '#10b981' }}>{currency} {metrics.cashSurrendered.toLocaleString()}</span>
+                    <span style={{ fontWeight: 700, color: '#059669' }}>{currency} {metrics.cashSurrendered.toLocaleString()}</span>
                   </div>
 
-                  <div style={{ borderTop: '1px dashed var(--border-medium)', paddingTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 800, fontSize: '13px', color: '#fff' }}>
+                  <div style={{ borderTop: '1px dashed var(--border-subtle)', paddingTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: 800, fontSize: '13px', color: 'var(--text-main)' }}>
                       Net Cash Owed to Counter:
                     </span>
-                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, color: isPendingCash ? '#ef4444' : '#10b981' }}>
+                    <span style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, color: isPendingCash ? '#ef4444' : '#059669' }}>
                       {isPendingCash ? `${currency} ${metrics.netCashOwed.toLocaleString()}` : 'CLEARED ✓'}
                     </span>
                   </div>
@@ -336,7 +336,7 @@ export function RiderTrackerView({ orders, onUpdateOrders, currency = BRAND.curr
                 Rider currently holds <strong>{currency} {selectedRiderForSettlement.metrics.netCashOwed.toLocaleString()}</strong> from COD deliveries. Enter amount surrendered to counter cashier:
               </div>
 
-              <div style={{ background: '#04070e', padding: '14px', borderRadius: '10px', textAlign: 'center', marginBottom: '14px' }}>
+              <div style={{ background: 'var(--bg-surface-elevated)', padding: '14px', borderRadius: '10px', textAlign: 'center', marginBottom: '14px', border: '1px solid var(--border-subtle)' }}>
                 <div style={{ fontSize: '11px', color: 'var(--text-dim)', textTransform: 'uppercase' }}>
                   Cash Amount Surrendering ({currency})
                 </div>
@@ -348,7 +348,7 @@ export function RiderTrackerView({ orders, onUpdateOrders, currency = BRAND.curr
                     background: 'transparent',
                     border: 'none',
                     textAlign: 'center',
-                    color: '#10b981',
+                    color: '#059669',
                     fontFamily: 'var(--font-display)',
                     fontSize: '32px',
                     fontWeight: 900,
@@ -367,9 +367,10 @@ export function RiderTrackerView({ orders, onUpdateOrders, currency = BRAND.curr
                     padding: '10px',
                     borderRadius: '8px',
                     background: 'var(--bg-surface-elevated)',
-                    color: '#fbbf24',
+                    color: 'var(--color-brand-primary)',
                     fontWeight: 700,
-                    fontSize: '12px'
+                    fontSize: '12px',
+                    border: '1px solid var(--border-subtle)'
                   }}
                 >
                   Full Clear ({currency} {selectedRiderForSettlement.metrics.netCashOwed.toLocaleString()})
@@ -381,8 +382,8 @@ export function RiderTrackerView({ orders, onUpdateOrders, currency = BRAND.curr
                     flex: 1,
                     padding: '10px',
                     borderRadius: '8px',
-                    background: '#10b981',
-                    color: '#090d16',
+                    background: 'linear-gradient(135deg, #10b981, #059669)',
+                    color: '#ffffff',
                     fontFamily: 'var(--font-display)',
                     fontWeight: 900,
                     fontSize: '13px'

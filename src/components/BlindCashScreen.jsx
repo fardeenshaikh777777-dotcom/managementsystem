@@ -69,8 +69,8 @@ export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos, cur
         {/* Screen Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <div>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, color: '#fff', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Lock size={26} color="#f59e0b" />
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Lock size={26} color="var(--color-brand-primary)" />
               Blind Cash Drawer Closing Screen
             </h1>
             <p style={{ fontSize: '13px', color: 'var(--text-muted)' }}>
@@ -86,7 +86,8 @@ export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos, cur
                 padding: '8px 16px',
                 borderRadius: '8px',
                 background: 'var(--bg-surface-elevated)',
-                color: '#fff',
+                color: 'var(--text-main)',
+                border: '1px solid var(--border-subtle)',
                 fontWeight: 700,
                 fontSize: '12px'
               }}
@@ -101,7 +102,7 @@ export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos, cur
             {/* Left: Currency Note Denomination Inputs */}
             <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)', borderRadius: '16px', padding: '20px', boxShadow: 'var(--shadow-md)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '16px', fontWeight: 800, color: '#fff' }}>
+                <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '16px', fontWeight: 800, color: 'var(--text-main)' }}>
                   Pakistani Rupee Note Breakdown
                 </h3>
                 <span style={{ fontSize: '11px', color: '#fbbf24', background: 'rgba(245, 158, 11, 0.15)', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>
@@ -128,7 +129,7 @@ export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos, cur
                       }}
                     >
                       <div>
-                        <div style={{ fontWeight: 800, fontSize: '14px', color: '#fff' }}>{d.label}</div>
+                        <div style={{ fontWeight: 800, fontSize: '14px', color: 'var(--text-main)' }}>{d.label}</div>
                         <div style={{ fontSize: '10px', color: 'var(--text-dim)' }}>Multiplier: × {d.mult.toLocaleString()}</div>
                       </div>
 
@@ -143,9 +144,9 @@ export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos, cur
                             width: '90px',
                             padding: '8px 10px',
                             borderRadius: '8px',
-                            background: '#04070e',
+                            background: 'var(--bg-surface)',
                             border: '1px solid var(--border-medium)',
-                            color: '#fff',
+                            color: 'var(--text-main)',
                             fontFamily: 'var(--font-display)',
                             fontSize: '16px',
                             fontWeight: 800,
@@ -178,7 +179,7 @@ export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos, cur
               </div>
 
               {/* Live Counted Box */}
-              <div style={{ background: '#04070e', border: '2px solid var(--border-accent)', borderRadius: '16px', padding: '20px', textAlign: 'center' }}>
+              <div style={{ background: 'var(--bg-surface-elevated)', border: '2px solid var(--border-accent)', borderRadius: '16px', padding: '20px', textAlign: 'center' }}>
                 <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-dim)', letterSpacing: '0.05em' }}>
                   Total Counted Physical Cash
                 </div>
@@ -206,7 +207,7 @@ export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos, cur
                     borderRadius: '8px',
                     background: 'var(--bg-surface)',
                     border: '1px solid var(--border-subtle)',
-                    color: '#fff',
+                    color: 'var(--text-main)',
                     fontSize: '12px',
                     outline: 'none'
                   }}
@@ -246,36 +247,36 @@ export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos, cur
               {report.isShortage ? <AlertTriangle size={36} color="#ef4444" /> : <ShieldCheck size={36} color="#10b981" />}
             </div>
 
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, color: '#fff', marginBottom: '6px' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, color: 'var(--text-main)', marginBottom: '6px' }}>
               Shift Session Locked & Reconciled
             </h2>
             <p style={{ fontSize: '14px', color: 'var(--text-muted)', marginBottom: '24px' }}>
               {report.message}
             </p>
 
-            <div style={{ background: '#04070e', borderRadius: '14px', padding: '20px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ background: 'var(--bg-surface-elevated)', borderRadius: '14px', padding: '20px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '10px', border: '1px solid var(--border-subtle)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted)' }}>
                 <span>Opening Cash Float:</span>
-                <span style={{ fontWeight: 700, color: '#fff' }}>{currency} {report.openingCash?.toLocaleString()}</span>
+                <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>{currency} {report.openingCash?.toLocaleString()}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted)' }}>
                 <span>Paid Cash Sales (Shift Total):</span>
-                <span style={{ fontWeight: 700, color: '#fff' }}>{currency} {report.cashSalesTotal?.toLocaleString()}</span>
+                <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>{currency} {report.cashSalesTotal?.toLocaleString()}</span>
               </div>
               <div style={{ borderTop: '1px dashed var(--border-medium)', paddingTop: '8px', display: 'flex', justifyContent: 'space-between', fontSize: '15px', fontWeight: 800 }}>
                 <span>System Expected Cash:</span>
-                <span style={{ color: '#38bdf8' }}>{currency} {report.expectedCashTotal?.toLocaleString()}</span>
+                <span style={{ color: 'var(--color-blue, #2563eb)' }}>{currency} {report.expectedCashTotal?.toLocaleString()}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '15px', fontWeight: 800 }}>
                 <span>Physical Cash Counted:</span>
-                <span style={{ color: '#10b981' }}>{currency} {report.physicalCashTotal?.toLocaleString()}</span>
+                <span style={{ color: 'var(--color-emerald, #059669)' }}>{currency} {report.physicalCashTotal?.toLocaleString()}</span>
               </div>
 
               <div style={{ borderTop: '2px solid var(--border-bright)', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontWeight: 900, fontSize: '16px' }}>
                   {report.isShortage ? 'DISCREPANCY (SHORTAGE):' : report.isOverage ? 'DISCREPANCY (OVERAGE):' : 'DISCREPANCY:'}
                 </span>
-                <span style={{ fontFamily: 'var(--font-display)', fontSize: '26px', fontWeight: 900, color: report.isShortage ? '#ef4444' : report.isOverage ? '#f59e0b' : '#10b981' }}>
+                <span style={{ fontFamily: 'var(--font-display)', fontSize: '26px', fontWeight: 900, color: report.isShortage ? '#dc2626' : report.isOverage ? 'var(--color-brand-primary)' : '#059669' }}>
                   {report.isBalanced ? `BALANCED (${currency} 0)` : `${currency} ${Math.abs(report.cashDiscrepancy).toLocaleString()}`}
                 </span>
               </div>
@@ -290,7 +291,8 @@ export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos, cur
                   padding: '14px',
                   borderRadius: '10px',
                   background: 'var(--bg-surface-elevated)',
-                  color: '#fff',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-main)',
                   fontWeight: 800,
                   fontSize: '14px',
                   display: 'flex',

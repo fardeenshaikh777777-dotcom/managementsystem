@@ -84,7 +84,7 @@ export function ManagerVoidModal({ orders, onVoidSuccess, onClose }) {
                   borderRadius: '8px',
                   background: 'var(--bg-surface-elevated)',
                   border: '1px solid var(--border-subtle)',
-                  color: '#fff',
+                  color: 'var(--text-main)',
                   fontSize: '13px',
                   fontWeight: 600
                 }}
@@ -101,8 +101,8 @@ export function ManagerVoidModal({ orders, onVoidSuccess, onClose }) {
           </div>
 
           {selectedOrder && (
-            <div style={{ background: 'var(--bg-surface-elevated)', padding: '8px 12px', borderRadius: '8px', fontSize: '12px', marginBottom: '12px' }}>
-              <div style={{ fontWeight: 700, color: '#fff' }}>
+            <div style={{ background: 'var(--bg-surface-elevated)', padding: '8px 12px', borderRadius: '8px', fontSize: '12px', marginBottom: '12px', border: '1px solid var(--border-subtle)' }}>
+              <div style={{ fontWeight: 700, color: 'var(--text-main)' }}>
                 Order #{selectedOrder.token} Summary:
               </div>
               <div style={{ color: 'var(--text-muted)', fontSize: '11px' }}>
@@ -125,7 +125,7 @@ export function ManagerVoidModal({ orders, onVoidSuccess, onClose }) {
                 borderRadius: '8px',
                 background: 'var(--bg-surface-elevated)',
                 border: '1px solid var(--border-subtle)',
-                color: '#fff',
+                color: 'var(--text-main)',
                 fontSize: '13px'
               }}
               value={reason}
@@ -146,7 +146,7 @@ export function ManagerVoidModal({ orders, onVoidSuccess, onClose }) {
                     width: '42px',
                     height: '48px',
                     borderRadius: '10px',
-                    background: '#04070e',
+                    background: 'var(--bg-surface-elevated)',
                     border: '2px solid ' + (managerPin.length > idx ? '#ef4444' : 'var(--border-subtle)'),
                     display: 'flex',
                     alignItems: 'center',

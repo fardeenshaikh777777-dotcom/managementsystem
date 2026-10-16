@@ -12,57 +12,57 @@ function getDishCardTheme(item) {
 
   if (cat === 'broast' || station.includes('fryer')) {
     return {
-      gradient: 'linear-gradient(135deg, #78350f 0%, #b45309 50%, #d97706 100%)',
-      accent: '#f59e0b',
+      gradient: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 40%, #fde68a 100%)',
+      accent: '#d97706',
       icon: '🍗',
       label: 'Fryer'
     };
   }
   if (cat === 'biryani' || item.isDaighItem || station.includes('daigh')) {
     return {
-      gradient: 'linear-gradient(135deg, #7f1d1d 0%, #b91c1c 50%, #d97706 100%)',
-      accent: '#f97316',
+      gradient: 'linear-gradient(135deg, #fff7ed 0%, #ffedd5 40%, #fed7aa 100%)',
+      accent: '#ea580c',
       icon: '🍚',
       label: 'Daigh'
     };
   }
   if (cat === 'karahi' || station.includes('wok') || item.pricingType === 'per_kg') {
     return {
-      gradient: 'linear-gradient(135deg, #431407 0%, #9a3412 50%, #ea580c 100%)',
-      accent: '#fb923c',
+      gradient: 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 40%, #fecaca 100%)',
+      accent: '#dc2626',
       icon: '🥘',
       label: 'Wok/Karahi'
     };
   }
   if (cat === 'bbq' || station.includes('bbq') || station.includes('grill')) {
     return {
-      gradient: 'linear-gradient(135deg, #1c1917 0%, #44403c 50%, #dc2626 100%)',
-      accent: '#ef4444',
+      gradient: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 40%, #e2e8f0 100%)',
+      accent: '#475569',
       icon: '🍢',
       label: 'Charcoal'
     };
   }
   if (cat === 'tandoor' || station.includes('tandoor')) {
     return {
-      gradient: 'linear-gradient(135deg, #451a03 0%, #78350f 50%, #92400e 100%)',
-      accent: '#fde047',
+      gradient: 'linear-gradient(135deg, #fefce8 0%, #fef9c3 40%, #fde047 100%)',
+      accent: '#ca8a04',
       icon: '🫓',
       label: 'Tandoor'
     };
   }
   if (cat === 'drinks' || station.includes('tea') || station.includes('bar')) {
     return {
-      gradient: 'linear-gradient(135deg, #042f2e 0%, #0f766e 50%, #14b8a6 100%)',
-      accent: '#2dd4bf',
+      gradient: 'linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 40%, #99f6e4 100%)',
+      accent: '#0d9488',
       icon: '☕',
       label: 'Beverage'
     };
   }
 
-  // Default culinary dark gradient
+  // Default modern light culinary gradient
   return {
-    gradient: 'linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)',
-    accent: '#94a3b8',
+    gradient: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%)',
+    accent: '#64748b',
     icon: '🍽️',
     label: 'Kitchen'
   };

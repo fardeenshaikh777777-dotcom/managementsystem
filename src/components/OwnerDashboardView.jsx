@@ -98,10 +98,10 @@ export function OwnerDashboardView({ orders, menuItems, activeShift, brand = BRA
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ fontSize: '18px' }}>👑</span>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 800, color: '#fff' }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 800, color: 'var(--text-main)' }}>
               Owner Executive Mobile Portal
             </h2>
-            <span style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', border: '1px solid #10b981', fontSize: '10px', padding: '2px 8px', borderRadius: '6px', fontWeight: 700 }}>
+            <span style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#059669', border: '1px solid #10b981', fontSize: '10px', padding: '2px 8px', borderRadius: '6px', fontWeight: 700 }}>
               LIVE FEED
             </span>
           </div>
@@ -119,7 +119,7 @@ export function OwnerDashboardView({ orders, menuItems, activeShift, brand = BRA
               padding: '6px 12px',
               borderRadius: '8px',
               background: !isMobileFrame ? 'var(--color-brand-primary)' : 'var(--bg-surface-elevated)',
-              color: !isMobileFrame ? '#090d16' : '#fff',
+              color: !isMobileFrame ? '#ffffff' : 'var(--text-main)',
               fontSize: '12px',
               fontWeight: 700,
               display: 'flex',
@@ -138,7 +138,7 @@ export function OwnerDashboardView({ orders, menuItems, activeShift, brand = BRA
               padding: '6px 12px',
               borderRadius: '8px',
               background: isMobileFrame ? 'var(--color-brand-primary)' : 'var(--bg-surface-elevated)',
-              color: isMobileFrame ? '#090d16' : '#fff',
+              color: isMobileFrame ? '#ffffff' : 'var(--text-main)',
               fontSize: '12px',
               fontWeight: 700,
               display: 'flex',
@@ -227,11 +227,11 @@ export function OwnerDashboardView({ orders, menuItems, activeShift, brand = BRA
           {/* 2. Daigh & Meat Inventory Real-Time Status */}
           <div style={{ background: 'var(--bg-surface)', padding: '16px', borderRadius: '14px', border: '1px solid var(--border-subtle)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 800, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 800, color: 'var(--text-main)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Flame size={16} color="#ef4444" />
                 Live Daigh & Raw Meat Inventory Monitor
               </h3>
-              <span style={{ fontSize: '11px', color: '#f59e0b', fontWeight: 700 }}>
+              <span style={{ fontSize: '11px', color: 'var(--color-brand-primary)', fontWeight: 700 }}>
                 Automation 1 & 2 Live
               </span>
             </div>
@@ -251,7 +251,7 @@ export function OwnerDashboardView({ orders, menuItems, activeShift, brand = BRA
                     }}
                   >
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div style={{ fontWeight: 800, fontSize: '13px', color: '#fff' }}>{d.name}</div>
+                      <div style={{ fontWeight: 800, fontSize: '13px', color: 'var(--text-main)' }}>{d.name}</div>
                       {isUnder5 && (
                         <span style={{ background: '#ef4444', color: '#fff', fontSize: '9px', padding: '2px 6px', borderRadius: '4px', fontWeight: 800 }}>
                           LOW POT
@@ -273,9 +273,9 @@ export function OwnerDashboardView({ orders, menuItems, activeShift, brand = BRA
             {/* Raw Meat Cuts Status */}
             <div style={{ display: 'grid', gridTemplateColumns: isMobileFrame ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '8px' }}>
               {rawMeats.map(m => (
-                <div key={m.name} style={{ background: '#04070e', padding: '8px 10px', borderRadius: '8px', fontSize: '11px' }}>
+                <div key={m.name} style={{ background: 'var(--bg-surface-elevated)', padding: '8px 10px', borderRadius: '8px', fontSize: '11px', border: '1px solid var(--border-subtle)' }}>
                   <div style={{ color: 'var(--text-muted)' }}>{m.name}</div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '14px', fontWeight: 800, color: '#fff' }}>{m.stock}</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontSize: '14px', fontWeight: 800, color: 'var(--text-main)' }}>{m.stock}</div>
                 </div>
               ))}
             </div>
@@ -285,22 +285,22 @@ export function OwnerDashboardView({ orders, menuItems, activeShift, brand = BRA
           <div style={{ display: 'grid', gridTemplateColumns: isMobileFrame ? '1fr' : '1fr 1fr', gap: '14px' }}>
             {/* Active Dine-In Tables */}
             <div style={{ background: 'var(--bg-surface)', padding: '16px', borderRadius: '14px', border: '1px solid var(--border-subtle)' }}>
-              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 800, color: '#fff', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 800, color: 'var(--text-main)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Utensils size={16} color="#3b82f6" />
                 Active Dine-In Tables
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {activeTables.map(t => (
-                  <div key={t.tableNo} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-surface-elevated)', padding: '8px 12px', borderRadius: '8px' }}>
+                  <div key={t.tableNo} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--bg-surface-elevated)', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--border-subtle)' }}>
                     <div>
-                      <div style={{ fontWeight: 800, fontSize: '13px', color: '#fff' }}>{t.tableNo}</div>
+                      <div style={{ fontWeight: 800, fontSize: '13px', color: 'var(--text-main)' }}>{t.tableNo}</div>
                       <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{t.guests} Guests • Seated {t.duration} ago</div>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '13px', color: '#f59e0b' }}>
+                      <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '13px', color: 'var(--color-brand-primary)' }}>
                         {currency} {t.amount.toLocaleString()}
                       </div>
-                      <span style={{ fontSize: '10px', color: '#10b981', fontWeight: 700 }}>{t.status}</span>
+                      <span style={{ fontSize: '10px', color: '#059669', fontWeight: 700 }}>{t.status}</span>
                     </div>
                   </div>
                 ))}
@@ -309,19 +309,19 @@ export function OwnerDashboardView({ orders, menuItems, activeShift, brand = BRA
 
             {/* Top Selling Items Leaderboard */}
             <div style={{ background: 'var(--bg-surface)', padding: '16px', borderRadius: '14px', border: '1px solid var(--border-subtle)' }}>
-              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 800, color: '#fff', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 800, color: 'var(--text-main)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <TrendingUp size={16} color="#10b981" />
                 Top Selling Items Tonight
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 {topDishes.map((dish, idx) => (
-                  <div key={dish.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', padding: '6px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div key={dish.name} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '12px', padding: '6px 0', borderBottom: '1px solid var(--border-subtle)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span style={{ fontWeight: 900, color: 'var(--text-dim)', width: '16px' }}>#{idx + 1}</span>
-                      <span style={{ fontWeight: 700, color: '#fff' }}>{dish.name}</span>
+                      <span style={{ fontWeight: 700, color: 'var(--text-main)' }}>{dish.name}</span>
                     </div>
                     <div style={{ textAlign: 'right' }}>
-                      <span style={{ fontWeight: 800, color: '#f59e0b' }}>{dish.count}</span>
+                      <span style={{ fontWeight: 800, color: 'var(--color-brand-primary)' }}>{dish.count}</span>
                       <span style={{ fontSize: '10px', color: 'var(--text-dim)', marginLeft: '6px' }}>{currency} {dish.sales.toLocaleString()}</span>
                     </div>
                   </div>
@@ -346,7 +346,7 @@ export function OwnerDashboardView({ orders, menuItems, activeShift, brand = BRA
               {voidLogs.map(log => (
                 <div key={log.id} style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.25)', padding: '10px 12px', borderRadius: '8px', fontSize: '12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                    <span style={{ fontWeight: 800, color: '#fff' }}>
+                    <span style={{ fontWeight: 800, color: 'var(--text-main)' }}>
                       Order #{log.token} Voided • {currency} {log.amount.toLocaleString()}
                     </span>
                     <span style={{ color: 'var(--text-dim)', fontSize: '11px' }}>{log.time}</span>

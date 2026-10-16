@@ -93,7 +93,7 @@ export function WeightCalculatorModal({ item, initialWeight = 1.0, onConfirm, on
                   padding: '8px 4px',
                   borderRadius: '8px',
                   background: weightKg === p.val ? 'var(--color-brand-primary)' : 'var(--bg-surface-elevated)',
-                  color: weightKg === p.val ? '#090d16' : '#fff',
+                  color: weightKg === p.val ? '#ffffff' : 'var(--text-main)',
                   fontFamily: 'var(--font-display)',
                   fontSize: '12px',
                   fontWeight: 800,
@@ -108,23 +108,23 @@ export function WeightCalculatorModal({ item, initialWeight = 1.0, onConfirm, on
           {/* Large Touch Digital Display */}
           <div
             style={{
-              background: '#04070e',
+              background: 'var(--bg-surface-elevated)',
               border: '2px solid var(--border-accent)',
               borderRadius: '12px',
               padding: '14px',
               textAlign: 'center',
-              boxShadow: 'inset 0 2px 8px rgba(0,0,0,0.6)'
+              boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.06)'
             }}
           >
             <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-dim)', letterSpacing: '0.05em' }}>
               Weighed Net Mass (KG)
             </div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '42px', fontWeight: 900, color: '#38bdf8', letterSpacing: '-0.02em' }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '42px', fontWeight: 900, color: 'var(--color-info)', letterSpacing: '-0.02em' }}>
               {weightStr} <span style={{ fontSize: '20px', color: 'var(--text-muted)' }}>KG</span>
             </div>
-            <div style={{ marginTop: '4px', borderTop: '1px solid #1e293b', paddingTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ marginTop: '4px', borderTop: '1px solid var(--border-subtle)', paddingTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Calculated Total:</span>
-              <span style={{ fontFamily: 'var(--font-display)', fontSize: '22px', fontWeight: 900, color: '#f59e0b' }}>
+              <span style={{ fontFamily: 'var(--font-display)', fontSize: '22px', fontWeight: 900, color: 'var(--color-brand-primary)' }}>
                 {currency} {calculatedPrice.toLocaleString()}
               </span>
             </div>

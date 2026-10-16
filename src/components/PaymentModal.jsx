@@ -137,8 +137,8 @@ export function PaymentModal({
           {/* Amount Due Box */}
           <div
             style={{
-              background: '#04070e',
-              border: '1px solid var(--border-medium)',
+              background: 'var(--bg-surface-elevated)',
+              border: '1px solid var(--border-subtle)',
               borderRadius: '12px',
               padding: '16px',
               textAlign: 'center',
@@ -148,7 +148,7 @@ export function PaymentModal({
             <div style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--text-dim)', letterSpacing: '0.05em' }}>
               Total Payable Amount
             </div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '38px', fontWeight: 900, color: '#f59e0b' }}>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '38px', fontWeight: 900, color: 'var(--color-brand-primary)' }}>
               {currency} {totalAmount.toLocaleString()}
             </div>
           </div>
@@ -169,7 +169,7 @@ export function PaymentModal({
                     padding: '10px 4px',
                     borderRadius: '8px',
                     background: tenderedAmount === totalAmount ? 'var(--color-brand-primary)' : 'var(--bg-surface-elevated)',
-                    color: tenderedAmount === totalAmount ? '#090d16' : '#fff',
+                    color: tenderedAmount === totalAmount ? '#ffffff' : 'var(--text-main)',
                     fontWeight: 800,
                     fontSize: '11px',
                     border: '1px solid var(--border-subtle)'
@@ -185,7 +185,7 @@ export function PaymentModal({
                     padding: '10px 4px',
                     borderRadius: '8px',
                     background: 'var(--bg-surface-elevated)',
-                    color: '#fff',
+                    color: 'var(--text-main)',
                     fontWeight: 800,
                     fontSize: '12px',
                     border: '1px solid var(--border-subtle)'
@@ -201,7 +201,7 @@ export function PaymentModal({
                     padding: '10px 4px',
                     borderRadius: '8px',
                     background: 'var(--bg-surface-elevated)',
-                    color: '#fff',
+                    color: 'var(--text-main)',
                     fontWeight: 800,
                     fontSize: '12px',
                     border: '1px solid var(--border-subtle)'
@@ -217,7 +217,7 @@ export function PaymentModal({
                     padding: '10px 4px',
                     borderRadius: '8px',
                     background: 'var(--bg-surface-elevated)',
-                    color: '#fbbf24',
+                    color: 'var(--color-brand-primary)',
                     fontWeight: 800,
                     fontSize: '12px',
                     border: '1px solid var(--border-subtle)'
@@ -236,7 +236,8 @@ export function PaymentModal({
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  marginBottom: '16px'
+                  marginBottom: '16px',
+                  border: '1px solid var(--border-subtle)'
                 }}
               >
                 <div>
@@ -246,7 +247,7 @@ export function PaymentModal({
                     style={{
                       background: 'transparent',
                       border: 'none',
-                      color: '#fff',
+                      color: 'var(--text-main)',
                       fontFamily: 'var(--font-display)',
                       fontSize: '20px',
                       fontWeight: 800,

@@ -121,9 +121,9 @@ export function ThermalReceiptModal({ order, onClose, isReprint = false, brand }
                   flex: 1,
                   padding: '9px 10px',
                   borderRadius: '8px',
-                  background: '#04070e',
+                  background: 'var(--bg-surface-elevated)',
                   border: '1px solid #10b981',
-                  color: '#fff',
+                  color: 'var(--text-main)',
                   fontSize: '13px',
                   fontWeight: 600,
                   outline: 'none'
