@@ -14,7 +14,8 @@ import {
   RotateCcw,
   Sparkles,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Zap
 } from 'lucide-react';
 import { RIDERS_LIST } from '../data/mockData';
 import { BRAND } from '../config/brand';
@@ -209,19 +210,27 @@ export function OrderCart({
         {cartItems.length === 0 ? (
           <div className="cart-empty-placeholder">
             <div className="empty-cloche-art">
-              <UtensilsCrossed size={44} className="empty-cloche-icon" />
+              <UtensilsCrossed size={36} className="empty-cloche-icon" />
               <div className="empty-cloche-ring" />
             </div>
             <div className="empty-cart-text">
               <h4 className="empty-cart-title">Order Cart is Empty</h4>
               <p className="empty-cart-subtitle">
-                Tap any dish on the menu grid to add it to this bill.
+                Tap any dish on the menu grid, or tap Quick Cash to tender immediately.
               </p>
             </div>
+            <button
+              type="button"
+              className="empty-cart-quick-btn"
+              onClick={() => onInitiateCheckout && onInitiateCheckout('cash')}
+              title="Fast cash order & receipt print"
+            >
+              <Zap size={13} /> Quick Cash Tender (F1)
+            </button>
             <div className="empty-cart-shortcuts">
-              <span className="shortcut-tag"><kbd>F1</kbd> Cash Pay</span>
+              <span className="shortcut-tag"><kbd>F1</kbd> Cash</span>
               <span className="shortcut-tag"><kbd>F2</kbd> Card</span>
-              <span className="shortcut-tag"><kbd>F4</kbd> Void</span>
+              <span className="shortcut-tag"><kbd>F3</kbd> COD</span>
             </div>
           </div>
         ) : (
@@ -341,13 +350,13 @@ export function OrderCart({
           <button
             type="button"
             className="big-pay-btn primary-cash"
-            disabled={cartItems.length === 0}
             onClick={() => onInitiateCheckout && onInitiateCheckout('cash')}
+            title="Fast cash payment & receipt print (F1)"
           >
             <div className="pay-btn-content">
               <div className="pay-btn-main">
                 <Banknote size={20} className="pay-icon" />
-                <span className="pay-title">CASH PAY</span>
+                <span className="pay-title">{cartItems.length === 0 ? 'QUICK CASH' : 'CASH PAY'}</span>
               </div>
               <span className="pay-hotkey-badge">F1</span>
             </div>
@@ -356,8 +365,8 @@ export function OrderCart({
           <button
             type="button"
             className="pay-btn secondary-card"
-            disabled={cartItems.length === 0}
             onClick={() => onInitiateCheckout && onInitiateCheckout('card')}
+            title="Card POS terminal payment (F2)"
           >
             <CreditCard size={18} />
             <span className="pay-sub-label">CARD</span>
@@ -367,8 +376,8 @@ export function OrderCart({
           <button
             type="button"
             className="pay-btn secondary-cod"
-            disabled={cartItems.length === 0}
             onClick={() => onInitiateCheckout && onInitiateCheckout('rider_cod')}
+            title="Rider Cash on Delivery (F3)"
           >
             <Truck size={18} />
             <span className="pay-sub-label">COD</span>

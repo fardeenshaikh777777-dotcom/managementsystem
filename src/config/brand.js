@@ -8,8 +8,9 @@ export const BRAND_PRESETS = {
   // 1. Karachi Express Restaurant & Grill (Primary Authentic Pakistani Restaurant)
   karachiExpress: {
     id: 'karachiExpress',
-    name: 'Karachi Express Restaurant & Grill',
-    nameUrdu: 'کراچی ایکسپریس ریسٹورنٹ',
+    name: 'Karachi Express',
+    fullName: 'Karachi Express Restaurant & Grill',
+    nameUrdu: 'کراچی ایکسپریس',
     tagline: 'Authentic Karahi, Dum Biryani & Charcoal BBQ',
     taglineUrdu: 'اصلی کڑاہی، دم بریانی اور کوئلہ باربی کیو',
     logoPath: '',
@@ -27,8 +28,9 @@ export const BRAND_PRESETS = {
   // 2. White-Label Flexible Client Preset
   default: {
     id: 'default',
-    name: 'Karachi Express Restaurant & Grill',
-    nameUrdu: 'کراچی ایکسپریس ریسٹورنٹ',
+    name: 'Karachi Express',
+    fullName: 'Karachi Express Restaurant & Grill',
+    nameUrdu: 'کراچی ایکسپریس',
     tagline: 'Fresh Flavors & Traditional Hospitality',
     taglineUrdu: 'تازہ اور لذیذ روایتی ذائقہ',
     logoPath: '',

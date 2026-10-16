@@ -257,6 +257,10 @@ export function ItemGrid({
                       <div
                         className={`dish-add-action ${isOutOfStock ? 'disabled' : ''}`}
                         title={isOutOfStock ? 'Item is sold out' : isVariableWeight ? 'Weigh Item' : 'Add to Bill'}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (!isOutOfStock && onSelectItem) onSelectItem(item);
+                        }}
                       >
                         {isVariableWeight ? (
                           <Scale size={15} />

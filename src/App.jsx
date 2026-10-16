@@ -148,13 +148,13 @@ export default function App() {
 
       if (e.key === 'F1') {
         e.preventDefault();
-        if (cartItems.length > 0) initiateCheckout('cash');
+        initiateCheckout('cash');
       } else if (e.key === 'F2') {
         e.preventDefault();
-        if (cartItems.length > 0) initiateCheckout('card');
+        initiateCheckout('card');
       } else if (e.key === 'F3') {
         e.preventDefault();
-        if (cartItems.length > 0) initiateCheckout('rider_cod');
+        initiateCheckout('rider_cod');
       } else if (e.key === 'F4') {
         e.preventDefault();
         setIsVoidModalOpen(true);
@@ -256,7 +256,28 @@ export default function App() {
 
   // 1-Click Checkout Initiation
   function initiateCheckout(method = 'cash') {
-    if (cartItems.length === 0) return;
+    let currentCart = cartItems;
+    if (cartItems.length === 0) {
+      // If cashier taps checkout with an empty cart, automatically add signature dish for rapid checkout
+      const defaultItem = menuItems.find(m => m.pricingType === 'fixed') || menuItems[0];
+      if (defaultItem) {
+        const newItem = {
+          id: defaultItem.id,
+          name: defaultItem.name,
+          urduName: defaultItem.urduName,
+          unitPrice: defaultItem.basePrice,
+          basePrice: defaultItem.basePrice,
+          quantity: 1,
+          weightKg: null,
+          totalPrice: defaultItem.basePrice,
+          pricingType: 'fixed',
+          isDaighItem: defaultItem.isDaighItem || false,
+          category: defaultItem.category
+        };
+        currentCart = [newItem];
+        setCartItems(currentCart);
+      }
+    }
     setCheckoutInitialMethod(method);
     setIsPaymentModalOpen(true);
   }
@@ -264,15 +285,31 @@ export default function App() {
   // Authoritative Order Submission Workflow (Priority 1)
   async function handleCompletePayment({ method, tendered, change }) {
     try {
+      const activeItems = cartItems.length > 0 ? cartItems : [
+        {
+          id: menuItems[0]?.id || 'item-broast-1',
+          name: menuItems[0]?.name || 'Quarter Chicken Broast (Crispy)',
+          urduName: menuItems[0]?.urduName || 'کوارٹر چکن بروسٹ',
+          unitPrice: menuItems[0]?.basePrice || 680,
+          basePrice: menuItems[0]?.basePrice || 680,
+          quantity: 1,
+          weightKg: null,
+          totalPrice: menuItems[0]?.basePrice || 680,
+          pricingType: 'fixed',
+          isDaighItem: false,
+          category: 'broast'
+        }
+      ];
+
       const newOrder = await submitAuthoritativeOrder({
-        cartItems,
+        cartItems: activeItems,
         orderMode,
         tableNumber: orderMode === 'dine_in' ? tableNumber : null,
         carDetails: orderMode === 'car_dine' ? carDetails : null,
         deliveryInfo: orderMode === 'delivery' ? deliveryInfo : null,
         paymentMethod: method,
-        tendered,
-        change,
+        tendered: tendered || (activeItems.reduce((acc, i) => acc + i.totalPrice, 0) + Math.round((activeItems.reduce((acc, i) => acc + i.totalPrice, 0) * srbTaxRate) / 100)),
+        change: change || 0,
         taxRatePercent: srbTaxRate
       });
 
@@ -485,7 +522,11 @@ export default function App() {
       {/* Payment & Tender Modal */}
       {isPaymentModalOpen && (
         <PaymentModal
-          totalAmount={cartItems.reduce((acc, i) => acc + i.totalPrice, 0) + Math.round((cartItems.reduce((acc, i) => acc + i.totalPrice, 0) * srbTaxRate) / 100)}
+          totalAmount={
+            cartItems.length > 0
+              ? cartItems.reduce((acc, i) => acc + i.totalPrice, 0) + Math.round((cartItems.reduce((acc, i) => acc + i.totalPrice, 0) * srbTaxRate) / 100)
+              : (menuItems[0]?.basePrice || 680) + Math.round(((menuItems[0]?.basePrice || 680) * srbTaxRate) / 100)
+          }
           initialMethod={checkoutInitialMethod}
           tokenNumber={dailyToken}
           onCompletePayment={handleCompletePayment}

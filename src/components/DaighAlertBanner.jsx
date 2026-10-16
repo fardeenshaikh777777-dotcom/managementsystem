@@ -14,23 +14,23 @@ export function DaighAlertBanner({ menuItems }) {
       <div className="daigh-banner-content">
         <span className="daigh-badge">
           <Flame size={12} style={{ display: 'inline', marginRight: '4px' }} />
-          Automation 2: Daigh Alert
+          Daigh Alert
         </span>
-        <AlertTriangle size={16} />
+        <AlertTriangle size={14} />
         <div>
           {lowStockDaighs.map((item, idx) => (
-            <span key={item.id} style={{ marginRight: '16px' }}>
-              <strong>{item.name} ({item.urduName}):</strong> Only{' '}
-              <span style={{ background: '#ef4444', color: '#fff', padding: '1px 6px', borderRadius: '4px', fontWeight: 900 }}>
+            <span key={item.id} style={{ marginRight: '12px' }}>
+              <strong>{item.name}:</strong> Only{' '}
+              <span style={{ background: '#ef4444', color: '#fff', padding: '1px 5px', borderRadius: '4px', fontWeight: 900 }}>
                 {item.daighPlatesRemaining ?? 4} plates
               </span>{' '}
-              left in live Daigh pot!
+              left!
             </span>
           ))}
         </div>
       </div>
-      <div style={{ fontSize: '11px', opacity: 0.9 }}>
-        ⚡ Counter Flagged Automatically (Under 5 Plates Rule)
+      <div style={{ fontSize: '11px', opacity: 0.9, whiteSpace: 'nowrap' }}>
+        ⚡ Under 5 Plates Rule
       </div>
     </div>
   );
