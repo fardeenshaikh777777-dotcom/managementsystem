@@ -5,42 +5,42 @@
 // ==============================================================================
 
 export const BRAND_PRESETS = {
-  // 1. Default White-Label Placeholder (Requested Default)
+  // 1. Karachi Express Restaurant & Grill (Primary Authentic Pakistani Restaurant)
+  karachiExpress: {
+    id: 'karachiExpress',
+    name: 'Karachi Express Restaurant & Grill',
+    nameUrdu: 'کراچی ایکسپریس ریسٹورنٹ',
+    tagline: 'Authentic Karahi, Dum Biryani & Charcoal BBQ',
+    taglineUrdu: 'اصلی کڑاہی، دم بریانی اور کوئلہ باربی کیو',
+    logoPath: '',
+    logoEmoji: '🔥',
+    accentColor: '#d97706', // Warm Amber
+    accentHover: '#b45309',
+    currency: 'Rs.',
+    branchInfo: 'Burns Road & Highway • Terminal POS-01',
+    address: 'Plot 42-C, Main Commercial Avenue, Phase 6, DHA, Karachi',
+    phone: '021-35891024 / 0300-9284719',
+    ntn: '8920194-2',
+    srbReg: '15-00-9821-001'
+  },
+
+  // 2. White-Label Flexible Client Preset
   default: {
     id: 'default',
-    name: 'Your Restaurant',
-    nameUrdu: 'آپ کا ریسٹورنٹ',
+    name: 'Karachi Express Restaurant & Grill',
+    nameUrdu: 'کراچی ایکسپریس ریسٹورنٹ',
     tagline: 'Fresh Flavors & Traditional Hospitality',
     taglineUrdu: 'تازہ اور لذیذ روایتی ذائقہ',
-    logoPath: '', // Set image path (e.g., '/logo.png') or leave empty for logoEmoji
+    logoPath: '',
     logoEmoji: '🍽️',
-    accentColor: '#f59e0b', // Saffron Amber
-    accentHover: '#d97706',
+    accentColor: '#d97706',
+    accentHover: '#b45309',
     currency: 'Rs.',
-    branchInfo: 'Main Branch • POS-01',
-    address: 'Main Commercial Avenue, Karachi',
+    branchInfo: 'Main Branch • Terminal POS-01',
+    address: 'Main Commercial Avenue, DHA, Karachi',
     phone: '0300-1234567 / 021-34567890',
     ntn: '1234567-8',
     srbReg: '15-00-1234-001'
-  },
-
-  // 2. Karachi Express POS Preset
-  karachiExpress: {
-    id: 'karachiExpress',
-    name: 'Karachi Express POS',
-    nameUrdu: 'کراچی ایکسپریس',
-    tagline: 'Burns Road & Highway • Traditional Karachi Taste',
-    taglineUrdu: 'برنس روڈ اور ہائی وے کا روایتی ذائقہ',
-    logoPath: '',
-    logoEmoji: '🔥',
-    accentColor: '#f59e0b',
-    accentHover: '#d97706',
-    currency: 'Rs.',
-    branchInfo: 'Burns Road & Highway • POS-01',
-    address: 'Highway & Burns Road • Karachi',
-    phone: '021-34981024 / 0300-9284719',
-    ntn: '8920194-2',
-    srbReg: '15-00-9821-001'
   },
 
   // 3. Khyber Shinwari & Karahi Preset

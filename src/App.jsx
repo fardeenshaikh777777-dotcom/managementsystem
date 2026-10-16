@@ -345,9 +345,9 @@ export default function App() {
     setActiveUser(user);
   }
 
-  // Reset Demo Data
+  // Reset Register & Shift Data
   async function handleResetDemoData() {
-    if (!confirm('Are you sure you want to reset demo orders and return to clean initial state?')) {
+    if (!confirm('Are you sure you want to reset the register and clear local session orders?')) {
       return;
     }
     await idbClear('orders');
@@ -356,7 +356,7 @@ export default function App() {
     setPlacedOrders([]);
     setPendingSyncCount(0);
     setMenuItems(INITIAL_MENU_ITEMS);
-    alert('Demo environment successfully reset to pristine initial state.');
+    alert('Register transaction ledger successfully reset to clean shift state.');
   }
 
   // Filter items by active category

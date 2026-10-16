@@ -393,10 +393,10 @@ export function OrderCart({
               type="button"
               className="reset-demo-link"
               onClick={onResetDemo}
-              title="Reset orders and cash drawers for a pristine client demonstration"
+              title="Reset register and clear session orders for a fresh shift"
             >
               <RotateCcw size={11} style={{ display: 'inline', marginRight: '4px' }} />
-              Reset Demo
+              Reset Register
             </button>
           )}
         </div>

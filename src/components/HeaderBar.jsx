@@ -143,7 +143,7 @@ export function HeaderBar({
               </span>
             )}
             <span className={`pos-mode-tag ${isRemoteConfigured ? 'remote' : 'demo'}`}>
-              {isRemoteConfigured ? 'Supabase Live' : 'Demo Mode'}
+              {isRemoteConfigured ? 'Cloud Live Sync' : 'Terminal Active'}
             </span>
           </div>
           <p className="pos-subtitle-text">

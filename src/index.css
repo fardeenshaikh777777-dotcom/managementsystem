@@ -998,18 +998,33 @@ button:active {
 /* Dish Card Banner (Culinary Hero Backdrop) */
 .dish-card-banner {
   position: relative;
-  height: 98px;
+  height: 108px;
   width: 100%;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--bg-surface-elevated);
 }
 
 .dish-card-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pos-dish-card:hover .dish-card-image {
+  transform: scale(1.08);
+}
+
+.dish-card-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.35) 0%, transparent 40%, rgba(15, 23, 42, 0.6) 100%);
+  pointer-events: none;
+  z-index: 1;
 }
 
 .dish-fallback-art {
@@ -1019,6 +1034,7 @@ button:active {
   align-items: center;
   justify-content: center;
   position: relative;
+  z-index: 1;
 }
 
 .dish-fallback-icon {
@@ -1121,6 +1137,7 @@ button:active {
   color: #334155;
   border: 1px solid rgba(15, 23, 42, 0.08);
   backdrop-filter: blur(4px);
+  z-index: 2;
 }
 
 /* Dish Card Body */
@@ -2571,4 +2588,378 @@ button:active {
   justify-content: center;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+/* ==============================================================================
+   RESPONSIVE DESIGN SYSTEM & MEDIA QUERIES
+   Touch Terminals, Tablets (Landscape & Portrait), Handhelds, Mobile Screens
+   ============================================================================== */
+
+/* 1. Large Screen & Standard POS Monitors (<= 1366px) */
+@media (max-width: 1366px) {
+  .pos-menu-panel {
+    flex: 0 0 62%;
+    width: 62%;
+  }
+  .pos-cart-panel {
+    flex: 0 0 38%;
+    width: 38%;
+  }
+  .item-grid {
+    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    gap: 12px;
+  }
+  .dish-card-banner {
+    height: 98px;
+  }
+}
+
+/* 2. Compact Touch Monitors & Tablet Landscape (<= 1100px) */
+@media (max-width: 1100px) {
+  .pos-header {
+    padding: 0 14px;
+    gap: 10px;
+  }
+  .pos-title-block p {
+    display: none;
+  }
+  .pos-menu-panel {
+    flex: 0 0 58%;
+    width: 58%;
+  }
+  .pos-cart-panel {
+    flex: 0 0 42%;
+    width: 42%;
+  }
+  .pos-view-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+    gap: 4px;
+  }
+  .item-grid {
+    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
+    gap: 10px;
+  }
+  .dish-card-banner {
+    height: 92px;
+  }
+  .dish-name-en {
+    font-size: 13px;
+  }
+  .dish-price-amount {
+    font-size: 16px;
+  }
+}
+
+/* 3. Tablet Portrait & Compact Displays (<= 920px) */
+@media (max-width: 920px) {
+  .pos-header {
+    height: auto;
+    min-height: 58px;
+    padding: 8px 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pos-view-nav {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    padding: 4px;
+    scroll-snap-type: x mandatory;
+    justify-content: flex-start;
+  }
+  .pos-view-btn {
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+  .pos-body {
+    flex-direction: row;
+  }
+  .pos-menu-panel {
+    flex: 0 0 55%;
+    width: 55%;
+  }
+  .pos-cart-panel {
+    flex: 0 0 45%;
+    width: 45%;
+  }
+  .item-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+  }
+  .dish-card-banner {
+    height: 84px;
+  }
+  .dish-card-body {
+    padding: 8px 10px;
+  }
+  .order-mode-segmented-control {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
+  }
+  .mode-segment-btn {
+    padding: 8px 6px;
+    font-size: 11px;
+  }
+  .quick-table-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+  }
+  .table-tile-btn {
+    padding: 6px 2px;
+    font-size: 11px;
+  }
+  .cart-pay-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+  .pay-btn.primary-cash,
+  .pay-btn.secondary-card,
+  .pay-btn.secondary-cod {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* 4. Handheld Terminals & Mobile Devices (<= 768px) */
+@media (max-width: 768px) {
+  .pos-container {
+    height: 100vh;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .pos-header {
+    height: auto;
+    padding: 8px 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+  .pos-header-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+  .pos-title-text {
+    font-size: 14px;
+  }
+  .pos-urdu-badge {
+    display: none;
+  }
+  .pos-header-clock {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+  .pos-body {
+    flex-direction: column;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .pos-menu-panel {
+    flex: none;
+    width: 100%;
+    border-right: none;
+    border-bottom: 2px solid var(--border-subtle);
+    overflow: visible;
+    min-height: auto;
+  }
+  .pos-cart-panel {
+    flex: none;
+    width: 100%;
+    min-height: auto;
+    box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.08);
+    overflow: visible;
+  }
+  .pos-category-nav-wrapper {
+    position: sticky;
+    top: 0;
+    z-index: 12;
+  }
+  .category-tabs-bar {
+    padding: 8px 10px;
+    gap: 8px;
+  }
+  .cat-tab-btn {
+    min-height: 40px;
+    padding: 6px 12px;
+    gap: 6px;
+  }
+  .cat-tab-icon {
+    font-size: 16px;
+  }
+  .cat-tab-en {
+    font-size: 12px;
+  }
+  .search-filter-bar {
+    padding: 8px 10px;
+  }
+  .search-input {
+    padding: 8px 32px 8px 34px;
+    font-size: 13px;
+  }
+  .dish-count-indicator {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  .item-grid-scroll {
+    padding: 10px;
+    overflow: visible;
+  }
+  .item-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .dish-card-banner {
+    height: 84px;
+  }
+  .pos-dish-card {
+    border-radius: 12px;
+  }
+  .dish-card-body {
+    padding: 8px 10px;
+  }
+  .dish-name-en {
+    font-size: 13px;
+  }
+  .dish-price-amount {
+    font-size: 16px;
+  }
+  .dish-add-action {
+    width: 32px;
+    height: 32px;
+  }
+  .cart-header-section {
+    padding: 12px;
+  }
+  .cart-mode-config-box {
+    padding: 10px;
+  }
+  .cart-items-scroll {
+    max-height: 260px;
+    padding: 8px 10px;
+  }
+  .cart-item-row {
+    padding: 8px;
+    gap: 6px;
+  }
+  .item-stepper-btn {
+    width: 28px;
+    height: 28px;
+  }
+  .cart-totals-section {
+    padding: 12px;
+  }
+  .cart-total-row .total-amount {
+    font-size: 22px;
+  }
+
+  /* Modals Mobile Adaptation */
+  .modal-overlay {
+    padding: 8px;
+    align-items: center;
+  }
+  .modal-window {
+    width: 96vw !important;
+    max-width: 96vw !important;
+    max-height: 92vh;
+    border-radius: 16px;
+    margin: auto;
+  }
+  .modal-header {
+    padding: 12px 14px;
+  }
+  .modal-header h3 {
+    font-size: 15px;
+  }
+  .modal-body {
+    padding: 14px;
+  }
+  .numpad-grid {
+    gap: 6px;
+  }
+  .numpad-btn {
+    height: 48px;
+    font-size: 18px;
+  }
+
+  /* Owner Mobile Dashboard & Rider Tracker */
+  .owner-dashboard-container {
+    padding: 12px;
+  }
+  .owner-dashboard-container .kpi-grid,
+  .rider-tracker-container .kpi-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .owner-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .blind-cash-layout {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* 5. Small Smartphone Screens (<= 480px) */
+@media (max-width: 480px) {
+  .pos-logo-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 18px;
+  }
+  .pos-header-clock {
+    display: none;
+  }
+  .pos-user-name {
+    display: none;
+  }
+  .pos-view-btn {
+    padding: 5px 8px;
+    font-size: 10px;
+  }
+  .item-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .dish-card-banner {
+    height: 74px;
+  }
+  .dish-name-en {
+    font-size: 12px;
+  }
+  .dish-name-urdu {
+    font-size: 10px;
+  }
+  .dish-price-amount {
+    font-size: 14px;
+  }
+  .dish-card-station-tag {
+    font-size: 8px;
+    padding: 1px 4px;
+  }
+}
+
+/* 6. Print Styling for 80mm Thermal Receipt */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .thermal-receipt-paper,
+  .thermal-receipt-paper * {
+    visibility: visible;
+  }
+  .thermal-receipt-paper {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm !important;
+    margin: 0 !important;
+    padding: 4mm !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
 }
