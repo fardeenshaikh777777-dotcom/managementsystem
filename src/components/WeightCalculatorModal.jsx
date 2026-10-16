@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Scale, X, Check, Delete } from 'lucide-react';
+import { BRAND } from '../config/brand';
 
-export function WeightCalculatorModal({ item, initialWeight = 1.0, onConfirm, onClose }) {
+export function WeightCalculatorModal({ item, initialWeight = 1.0, onConfirm, onClose, currency = BRAND.currency }) {
   const [weightStr, setWeightStr] = useState(initialWeight ? initialWeight.toString() : '1.0');
 
   useEffect(() => {
@@ -78,7 +79,7 @@ export function WeightCalculatorModal({ item, initialWeight = 1.0, onConfirm, on
 
           {/* Rate Notice */}
           <div style={{ textAlign: 'center', fontSize: '12px', color: 'var(--text-dim)', marginBottom: '12px' }}>
-            Base Price: <strong>Rs. {item?.basePrice.toLocaleString()}</strong> per 1.000 KG
+            Base Price: <strong>{currency} {item?.basePrice.toLocaleString()}</strong> per 1.000 KG
           </div>
 
           {/* Quick Presets Grid */}
@@ -124,7 +125,7 @@ export function WeightCalculatorModal({ item, initialWeight = 1.0, onConfirm, on
             <div style={{ marginTop: '4px', borderTop: '1px solid #1e293b', paddingTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Calculated Total:</span>
               <span style={{ fontFamily: 'var(--font-display)', fontSize: '22px', fontWeight: 900, color: '#f59e0b' }}>
-                Rs. {calculatedPrice.toLocaleString()}
+                {currency} {calculatedPrice.toLocaleString()}
               </span>
             </div>
           </div>

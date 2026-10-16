@@ -13,8 +13,9 @@ import {
   Scale, 
   RefreshCw 
 } from 'lucide-react';
+import { BRAND } from '../config/brand';
 
-export function OwnerDashboardView({ orders, menuItems, activeShift }) {
+export function OwnerDashboardView({ orders, menuItems, activeShift, brand = BRAND, currency = BRAND.currency }) {
   const [isMobileFrame, setIsMobileFrame] = useState(false);
 
   // Compute live owner analytics strictly from genuine stored records
@@ -105,7 +106,7 @@ export function OwnerDashboardView({ orders, menuItems, activeShift }) {
             </span>
           </div>
           <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-            Real-time branch monitoring • Karachi Burns Road & Superhighway Branch
+            Real-time branch monitoring • {brand.name} • {brand.branchInfo}
           </p>
         </div>
 
@@ -179,7 +180,7 @@ export function OwnerDashboardView({ orders, menuItems, activeShift }) {
                 Today's Gross Sales
               </div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, color: '#f59e0b', margin: '4px 0' }}>
-                Rs. {totalRevenue.toLocaleString()}
+                {currency} {totalRevenue.toLocaleString()}
               </div>
               <div style={{ fontSize: '11px', color: '#10b981', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <TrendingUp size={12} /> +18.4% vs yesterday
@@ -191,7 +192,7 @@ export function OwnerDashboardView({ orders, menuItems, activeShift }) {
                 Cash in Register
               </div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, color: '#10b981', margin: '4px 0' }}>
-                Rs. {cashRevenue.toLocaleString()}
+                {currency} {cashRevenue.toLocaleString()}
               </div>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                 Cashier: {activeShift?.cashierName?.split(' ')[0] || 'Asad'}
@@ -203,7 +204,7 @@ export function OwnerDashboardView({ orders, menuItems, activeShift }) {
                 Card / Digital Pay
               </div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, color: '#38bdf8', margin: '4px 0' }}>
-                Rs. {cardRevenue.toLocaleString()}
+                {currency} {cardRevenue.toLocaleString()}
               </div>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                 Direct bank settlement
@@ -215,7 +216,7 @@ export function OwnerDashboardView({ orders, menuItems, activeShift }) {
                 Rider COD Float
               </div>
               <div style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, color: '#ec4899', margin: '4px 0' }}>
-                Rs. {codRevenue.toLocaleString()}
+                {currency} {codRevenue.toLocaleString()}
               </div>
               <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                 3 Motorbikes active
@@ -297,7 +298,7 @@ export function OwnerDashboardView({ orders, menuItems, activeShift }) {
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '13px', color: '#f59e0b' }}>
-                        Rs. {t.amount.toLocaleString()}
+                        {currency} {t.amount.toLocaleString()}
                       </div>
                       <span style={{ fontSize: '10px', color: '#10b981', fontWeight: 700 }}>{t.status}</span>
                     </div>
@@ -321,7 +322,7 @@ export function OwnerDashboardView({ orders, menuItems, activeShift }) {
                     </div>
                     <div style={{ textAlign: 'right' }}>
                       <span style={{ fontWeight: 800, color: '#f59e0b' }}>{dish.count}</span>
-                      <span style={{ fontSize: '10px', color: 'var(--text-dim)', marginLeft: '6px' }}>Rs. {dish.sales.toLocaleString()}</span>
+                      <span style={{ fontSize: '10px', color: 'var(--text-dim)', marginLeft: '6px' }}>{currency} {dish.sales.toLocaleString()}</span>
                     </div>
                   </div>
                 ))}
@@ -346,7 +347,7 @@ export function OwnerDashboardView({ orders, menuItems, activeShift }) {
                 <div key={log.id} style={{ background: 'rgba(239, 68, 68, 0.08)', border: '1px solid rgba(239, 68, 68, 0.25)', padding: '10px 12px', borderRadius: '8px', fontSize: '12px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                     <span style={{ fontWeight: 800, color: '#fff' }}>
-                      Order #{log.token} Voided • Rs. {log.amount.toLocaleString()}
+                      Order #{log.token} Voided • {currency} {log.amount.toLocaleString()}
                     </span>
                     <span style={{ color: 'var(--text-dim)', fontSize: '11px' }}>{log.time}</span>
                   </div>
@@ -365,7 +366,7 @@ export function OwnerDashboardView({ orders, menuItems, activeShift }) {
               <span style={{ color: 'var(--text-muted)' }}>Latest Cash Drawer Status:</span>
               <span style={{ fontWeight: 800, color: activeShift?.cashDiscrepancy < 0 ? '#ef4444' : '#10b981' }}>
                 {activeShift?.cashDiscrepancy
-                  ? `Shift #${activeShift.sessionNumber}: Rs. ${activeShift.cashDiscrepancy} (${activeShift.cashDiscrepancy < 0 ? 'SHORTAGE' : 'OVERAGE'})`
+                  ? `Shift #${activeShift.sessionNumber}: ${currency} ${activeShift.cashDiscrepancy} (${activeShift.cashDiscrepancy < 0 ? 'SHORTAGE' : 'OVERAGE'})`
                   : `Shift #${activeShift?.sessionNumber || 104}: Active & Balanced`}
               </span>
             </div>

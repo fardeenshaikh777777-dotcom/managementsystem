@@ -3,8 +3,9 @@ import { Bike, DollarSign, Clock, Phone, CheckCircle2, UserPlus, AlertCircle, Se
 import confetti from 'canvas-confetti';
 import { recordRiderHandover } from '../services/posService';
 import { INITIAL_RIDERS, RIDER_STATUS } from '../data/mockData';
+import { BRAND } from '../config/brand';
 
-export function RiderTrackerView({ orders, onUpdateOrders }) {
+export function RiderTrackerView({ orders, onUpdateOrders, currency = BRAND.currency }) {
   const [riders, setRiders] = useState(INITIAL_RIDERS);
   const [activeTab, setActiveTab] = useState('ledger'); // 'ledger', 'dispatch', 'settle'
   const [selectedRiderForSettlement, setSelectedRiderForSettlement] = useState(null);
@@ -147,7 +148,7 @@ export function RiderTrackerView({ orders, onUpdateOrders }) {
               Total COD Cash Collected
             </div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, color: '#38bdf8' }}>
-              Rs. {totalFleetCollected.toLocaleString()}
+              {currency} {totalFleetCollected.toLocaleString()}
             </div>
           </div>
 
@@ -156,7 +157,7 @@ export function RiderTrackerView({ orders, onUpdateOrders }) {
               Cash Deposited to Counter
             </div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, color: '#10b981' }}>
-              Rs. {totalFleetSurrendered.toLocaleString()}
+              {currency} {totalFleetSurrendered.toLocaleString()}
             </div>
           </div>
 
@@ -165,7 +166,7 @@ export function RiderTrackerView({ orders, onUpdateOrders }) {
               Net Cash Owed by Riders
             </div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, color: '#ef4444' }}>
-              Rs. {totalFleetPending.toLocaleString()}
+              {currency} {totalFleetPending.toLocaleString()}
             </div>
           </div>
         </div>
@@ -268,12 +269,12 @@ export function RiderTrackerView({ orders, onUpdateOrders }) {
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-muted)' }}>
                     <span>Gross COD Cash Collected:</span>
-                    <span style={{ fontWeight: 700, color: '#38bdf8' }}>Rs. {metrics.totalCollected.toLocaleString()}</span>
+                    <span style={{ fontWeight: 700, color: '#38bdf8' }}>{currency} {metrics.totalCollected.toLocaleString()}</span>
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-muted)' }}>
                     <span>Cash Already Surrendered:</span>
-                    <span style={{ fontWeight: 700, color: '#10b981' }}>Rs. {metrics.cashSurrendered.toLocaleString()}</span>
+                    <span style={{ fontWeight: 700, color: '#10b981' }}>{currency} {metrics.cashSurrendered.toLocaleString()}</span>
                   </div>
 
                   <div style={{ borderTop: '1px dashed var(--border-medium)', paddingTop: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -281,7 +282,7 @@ export function RiderTrackerView({ orders, onUpdateOrders }) {
                       Net Cash Owed to Counter:
                     </span>
                     <span style={{ fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 900, color: isPendingCash ? '#ef4444' : '#10b981' }}>
-                      {isPendingCash ? `Rs. ${metrics.netCashOwed.toLocaleString()}` : 'CLEARED ✓'}
+                      {isPendingCash ? `${currency} ${metrics.netCashOwed.toLocaleString()}` : 'CLEARED ✓'}
                     </span>
                   </div>
                 </div>
@@ -332,12 +333,12 @@ export function RiderTrackerView({ orders, onUpdateOrders }) {
             </div>
             <div className="modal-body">
               <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginBottom: '12px' }}>
-                Rider currently holds <strong>Rs. {selectedRiderForSettlement.metrics.netCashOwed.toLocaleString()}</strong> from COD deliveries. Enter amount surrendered to counter cashier:
+                Rider currently holds <strong>{currency} {selectedRiderForSettlement.metrics.netCashOwed.toLocaleString()}</strong> from COD deliveries. Enter amount surrendered to counter cashier:
               </div>
 
               <div style={{ background: '#04070e', padding: '14px', borderRadius: '10px', textAlign: 'center', marginBottom: '14px' }}>
                 <div style={{ fontSize: '11px', color: 'var(--text-dim)', textTransform: 'uppercase' }}>
-                  Cash Amount Surrendering (PKR)
+                  Cash Amount Surrendering ({currency})
                 </div>
                 <input
                   type="number"
@@ -371,7 +372,7 @@ export function RiderTrackerView({ orders, onUpdateOrders }) {
                     fontSize: '12px'
                   }}
                 >
-                  Full Clear (Rs. {selectedRiderForSettlement.metrics.netCashOwed.toLocaleString()})
+                  Full Clear ({currency} {selectedRiderForSettlement.metrics.netCashOwed.toLocaleString()})
                 </button>
                 <button
                   type="button"

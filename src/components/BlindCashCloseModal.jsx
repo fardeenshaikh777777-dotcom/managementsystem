@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Lock, Calculator, CheckCircle2, AlertTriangle, X, ShieldCheck } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { executeBlindShiftClose } from '../services/posService';
+import { BRAND } from '../config/brand';
 
-export function BlindCashCloseModal({ activeShift, onShiftClosed, onClose }) {
+export function BlindCashCloseModal({ activeShift, onShiftClosed, onClose, currency = BRAND.currency }) {
   const [notes, setNotes] = useState({
     '5000': '',
     '1000': '',
@@ -54,15 +55,15 @@ export function BlindCashCloseModal({ activeShift, onShiftClosed, onClose }) {
   }
 
   const DENOMS = [
-    { key: '5000', label: 'Rs. 5,000 Notes', mult: 5000, color: '#f59e0b' },
-    { key: '1000', label: 'Rs. 1,000 Notes', mult: 1000, color: '#3b82f6' },
-    { key: '500', label: 'Rs. 500 Notes', mult: 500, color: '#10b981' },
-    { key: '100', label: 'Rs. 100 Notes', mult: 100, color: '#ec4899' },
-    { key: '75', label: 'Rs. 75 Diamond Note', mult: 75, color: '#8b5cf6' },
-    { key: '50', label: 'Rs. 50 Notes', mult: 50, color: '#14b8a6' },
-    { key: '20', label: 'Rs. 20 Notes', mult: 20, color: '#f97316' },
-    { key: '10', label: 'Rs. 10 Notes', mult: 10, color: '#84cc16' },
-    { key: 'coins', label: 'Loose Coins / Change (PKR)', mult: 1, color: '#94a3b8' }
+    { key: '5000', label: `${currency} 5,000 Notes`, mult: 5000, color: '#f59e0b' },
+    { key: '1000', label: `${currency} 1,000 Notes`, mult: 1000, color: '#3b82f6' },
+    { key: '500', label: `${currency} 500 Notes`, mult: 500, color: '#10b981' },
+    { key: '100', label: `${currency} 100 Notes`, mult: 100, color: '#ec4899' },
+    { key: '75', label: `${currency} 75 Note`, mult: 75, color: '#8b5cf6' },
+    { key: '50', label: `${currency} 50 Notes`, mult: 50, color: '#14b8a6' },
+    { key: '20', label: `${currency} 20 Notes`, mult: 20, color: '#f97316' },
+    { key: '10', label: `${currency} 10 Notes`, mult: 10, color: '#84cc16' },
+    { key: 'coins', label: `Loose Coins / Change (${currency})`, mult: 1, color: '#94a3b8' }
   ];
 
   return (
@@ -141,7 +142,7 @@ export function BlindCashCloseModal({ activeShift, onShiftClosed, onClose }) {
                           }}
                         />
                         <div style={{ width: '100px', textAlign: 'right', fontFamily: 'var(--font-display)', fontSize: '13px', fontWeight: 800, color: rowSubtotal > 0 ? '#38bdf8' : 'var(--text-dim)' }}>
-                          Rs. {rowSubtotal.toLocaleString()}
+                          {currency} {rowSubtotal.toLocaleString()}
                         </div>
                       </div>
                     </div>
@@ -171,7 +172,7 @@ export function BlindCashCloseModal({ activeShift, onShiftClosed, onClose }) {
                   </div>
                 </div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '28px', fontWeight: 900, color: '#10b981' }}>
-                  Rs. {countedTotal.toLocaleString()}
+                  {currency} {countedTotal.toLocaleString()}
                 </div>
               </div>
 
@@ -253,19 +254,19 @@ export function BlindCashCloseModal({ activeShift, onShiftClosed, onClose }) {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted)' }}>
                   <span>Opening Cash Float:</span>
-                  <span style={{ fontWeight: 700, color: '#fff' }}>Rs. {closingReport.openingCash?.toLocaleString()}</span>
+                  <span style={{ fontWeight: 700, color: '#fff' }}>{currency} {closingReport.openingCash?.toLocaleString()}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted)' }}>
                   <span>System Paid Cash Sales:</span>
-                  <span style={{ fontWeight: 700, color: '#fff' }}>Rs. {closingReport.cashSalesTotal?.toLocaleString()}</span>
+                  <span style={{ fontWeight: 700, color: '#fff' }}>{currency} {closingReport.cashSalesTotal?.toLocaleString()}</span>
                 </div>
                 <div style={{ borderTop: '1px dashed var(--border-medium)', paddingTop: '6px', display: 'flex', justifyContent: 'space-between', fontSize: '14px', fontWeight: 700 }}>
                   <span>Calculated Expected Cash:</span>
-                  <span style={{ color: '#38bdf8' }}>Rs. {closingReport.expectedCashTotal?.toLocaleString()}</span>
+                  <span style={{ color: '#38bdf8' }}>{currency} {closingReport.expectedCashTotal?.toLocaleString()}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', fontWeight: 700 }}>
                   <span>Your Counted Physical Cash:</span>
-                  <span style={{ color: '#10b981' }}>Rs. {closingReport.physicalCashTotal?.toLocaleString()}</span>
+                  <span style={{ color: '#10b981' }}>{currency} {closingReport.physicalCashTotal?.toLocaleString()}</span>
                 </div>
 
                 <div
@@ -290,7 +291,7 @@ export function BlindCashCloseModal({ activeShift, onShiftClosed, onClose }) {
                   >
                     {closingReport.isBalanced
                       ? 'PERFECTLY BALANCED'
-                      : `Rs. ${Math.abs(closingReport.cashDiscrepancy).toLocaleString()}`}
+                      : `${currency} ${Math.abs(closingReport.cashDiscrepancy).toLocaleString()}`}
                   </span>
                 </div>
               </div>

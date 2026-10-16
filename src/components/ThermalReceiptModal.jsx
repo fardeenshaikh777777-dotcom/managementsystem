@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Printer, CheckCircle2, X, Send, Copy, Check, MessageSquare } from 'lucide-react';
 import { getWhatsAppReceiptUrl, generateWhatsAppReceiptText } from '../utils/whatsappReceipt';
+import { BRAND } from '../config/brand';
 
-export function ThermalReceiptModal({ order, onClose, isReprint = false }) {
+export function ThermalReceiptModal({ order, onClose, isReprint = false, brand }) {
+  const currentBrand = brand || BRAND;
   const [customerPhone, setCustomerPhone] = useState(order?.customerPhone || '0300');
   const [copied, setCopied] = useState(false);
   const [paperWidth, setPaperWidth] = useState('80mm'); // '80mm' | '58mm'
@@ -190,16 +192,21 @@ export function ThermalReceiptModal({ order, onClose, isReprint = false }) {
 
             {/* Header */}
             <div className="thermal-center thermal-bold" style={{ fontSize: paperWidth === '58mm' ? '13px' : '15px' }}>
-              🔥 KARACHI SHINWARI & BROAST
+              {currentBrand.logoEmoji ? `${currentBrand.logoEmoji} ` : ''}{currentBrand.name.toUpperCase()}
             </div>
+            {currentBrand.nameUrdu && (
+              <div className="thermal-center thermal-bold" style={{ fontSize: '11px', marginTop: '2px' }}>
+                {currentBrand.nameUrdu}
+              </div>
+            )}
             <div className="thermal-center" style={{ fontSize: '10px' }}>
-              Highway & Burns Road • Karachi
+              {currentBrand.address}
             </div>
             <div className="thermal-center" style={{ fontSize: '9px' }}>
-              NTN: 8920194-2 • SRB Reg: 15-00-9821-001
+              NTN: {currentBrand.ntn} • SRB Reg: {currentBrand.srbReg}
             </div>
             <div className="thermal-center" style={{ fontSize: '10px' }}>
-              Ph: 021-34981024 / 0300-9284719
+              Ph: {currentBrand.phone}
             </div>
 
             {/* Giant Token Box */}
@@ -251,11 +258,11 @@ export function ThermalReceiptModal({ order, onClose, isReprint = false }) {
                   <span className="thermal-bold">
                     {item.quantity}x {item.name}
                   </span>
-                  <span>Rs. {item.totalPrice.toLocaleString()}</span>
+                  <span>{currentBrand.currency} {item.totalPrice.toLocaleString()}</span>
                 </div>
                 {item.weightKg && (
                   <div style={{ fontSize: '10px', color: '#444', paddingLeft: '8px' }}>
-                    (Weighed: {item.weightKg.toFixed(3)} kg @ Rs. {item.basePrice}/kg)
+                    (Weighed: {item.weightKg.toFixed(3)} kg @ {currentBrand.currency} {item.basePrice}/kg)
                   </div>
                 )}
                 {item.urduName && (
@@ -271,26 +278,26 @@ export function ThermalReceiptModal({ order, onClose, isReprint = false }) {
             {/* Totals */}
             <div className="thermal-table-row">
               <span>Subtotal:</span>
-              <span>Rs. {order.subtotal?.toLocaleString()}</span>
+              <span>{currentBrand.currency} {order.subtotal?.toLocaleString()}</span>
             </div>
             <div className="thermal-table-row">
               <span>Sindh Tax (SRB):</span>
-              <span>Rs. {order.tax?.toLocaleString()}</span>
+              <span>{currentBrand.currency} {order.tax?.toLocaleString()}</span>
             </div>
             <div className="thermal-table-row thermal-bold" style={{ fontSize: '14px', marginTop: '4px' }}>
               <span>TOTAL PAID:</span>
-              <span>Rs. {order.total?.toLocaleString()}</span>
+              <span>{currentBrand.currency} {order.total?.toLocaleString()}</span>
             </div>
 
             {order.paymentMethod === 'cash' && (
               <>
                 <div className="thermal-table-row" style={{ fontSize: '10px' }}>
                   <span>Cash Tendered:</span>
-                  <span>Rs. {order.tendered?.toLocaleString()}</span>
+                  <span>{currentBrand.currency} {order.tendered?.toLocaleString()}</span>
                 </div>
                 <div className="thermal-table-row thermal-bold" style={{ fontSize: '11px' }}>
                   <span>Change Returned:</span>
-                  <span>Rs. {order.change?.toLocaleString()}</span>
+                  <span>{currentBrand.currency} {order.change?.toLocaleString()}</span>
                 </div>
               </>
             )}

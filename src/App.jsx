@@ -12,7 +12,9 @@ import { BlindCashCloseModal } from './components/BlindCashCloseModal';
 import { RiderTrackerView } from './components/RiderTrackerView';
 import { BlindCashScreen } from './components/BlindCashScreen';
 import { OwnerDashboardView } from './components/OwnerDashboardView';
-import { INITIAL_MENU_ITEMS } from './data/mockData';
+import { TerminalSplashScreen } from './components/TerminalSplashScreen';
+import { INITIAL_MENU_ITEMS, CATEGORIES } from './data/mockData';
+import { BRAND, BRAND_PRESETS, applyBrandTheme } from './config/brand';
 import {
   submitAuthoritativeOrder,
   getAllStoredOrders,
@@ -26,6 +28,15 @@ import { getActiveUser, setActiveUser, ROLES } from './services/authService';
 import { idbClear } from './services/db';
 
 export default function App() {
+  // White-Label Active Brand State (defaults to "Your Restaurant" with presets available)
+  const [currentBrand, setCurrentBrand] = useState(BRAND);
+  const [showSplash, setShowSplash] = useState(false);
+
+  // Apply white-label brand theme (CSS accent variable, page title)
+  useEffect(() => {
+    applyBrandTheme(currentBrand);
+  }, [currentBrand]);
+
   // Active Navigation View: 'pos', 'riders', 'blind_cash', 'owner'
   const [activeView, setActiveView] = useState('pos');
 
@@ -372,6 +383,12 @@ export default function App() {
         currentUser={currentUser}
         onChangeRole={handleChangeRole}
         isRemoteConfigured={isRemoteConfigured}
+        brand={currentBrand}
+        onOpenSplash={() => setShowSplash(true)}
+        onSelectBrand={(b) => {
+          setCurrentBrand(b);
+          applyBrandTheme(b);
+        }}
       />
 
       {/* 2. Automation 2: Live Daigh Alert Banner (Fires when < 5 plates remaining) */}
@@ -383,7 +400,7 @@ export default function App() {
           {/* Left 65%: Fast Touch Screen Menu Grid */}
           <section className="pos-menu-panel">
             <CategoryNav
-              categories={INITIAL_MENU_ITEMS}
+              categories={CATEGORIES}
               activeCategory={activeCategory}
               onSelectCategory={setActiveCategory}
             />
@@ -392,6 +409,7 @@ export default function App() {
               items={filteredCategoryItems}
               onSelectItem={handleSelectItem}
               onOpenWeightModal={handleOpenWeightModalForEdit}
+              currency={currentBrand.currency}
             />
           </section>
 
@@ -410,11 +428,13 @@ export default function App() {
               cartItems={cartItems}
               onUpdateQty={handleUpdateCartQty}
               onRemoveItem={handleRemoveCartItem}
+              onOpenWeightModalForEdit={handleOpenWeightModalForEdit}
               srbTaxRate={srbTaxRate}
               onChangeTaxRate={setSrbTaxRate}
               onInitiateCheckout={initiateCheckout}
               onOpenVoidModal={() => setIsVoidModalOpen(true)}
               onResetDemo={handleResetDemoData}
+              currency={currentBrand.currency}
             />
           </section>
         </main>
@@ -477,6 +497,7 @@ export default function App() {
       {receiptOrder && (
         <ThermalReceiptModal
           order={receiptOrder}
+          brand={currentBrand}
           onClose={() => setReceiptOrder(null)}
         />
       )}
@@ -500,6 +521,21 @@ export default function App() {
             setIsShiftCloseModalOpen(false);
             setActiveView('blind_cash');
           }}
+        />
+      )}
+
+      {/* White-Label Brand & Staff Terminal Splash Screen */}
+      {showSplash && (
+        <TerminalSplashScreen
+          currentBrand={currentBrand}
+          onSelectBrand={(b) => {
+            setCurrentBrand(b);
+            applyBrandTheme(b);
+          }}
+          currentUser={currentUser}
+          onChangeRole={handleChangeRole}
+          activeShift={activeShift}
+          onEnterPOS={() => setShowSplash(false)}
         />
       )}
     </div>

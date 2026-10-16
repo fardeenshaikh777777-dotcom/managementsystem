@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { Lock, Calculator, CheckCircle2, AlertTriangle, Printer, RotateCcw, ShieldCheck } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { executeBlindShiftClose } from '../services/posService';
+import { BRAND } from '../config/brand';
 
-export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos }) {
+export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos, currency = BRAND.currency }) {
   const [notes, setNotes] = useState({
     '5000': '',
     '1000': '',
@@ -52,14 +53,14 @@ export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos }) {
   }
 
   const DENOMS = [
-    { key: '5000', label: 'Rs. 5,000 Note', mult: 5000, color: '#f59e0b', tag: 'High Denom' },
-    { key: '1000', label: 'Rs. 1,000 Note', mult: 1000, color: '#3b82f6', tag: 'Standard' },
-    { key: '500', label: 'Rs. 500 Note', mult: 500, color: '#10b981', tag: 'Standard' },
-    { key: '100', label: 'Rs. 100 Note', mult: 100, color: '#ec4899', tag: 'Common' },
-    { key: '50', label: 'Rs. 50 Note', mult: 50, color: '#14b8a6', tag: 'Small Note' },
-    { key: '20', label: 'Rs. 20 Note', mult: 20, color: '#f97316', tag: 'Small Note' },
-    { key: '10', label: 'Rs. 10 Note', mult: 10, color: '#84cc16', tag: 'Small Note' },
-    { key: 'coins', label: 'Loose Coins / Change', mult: 1, color: '#94a3b8', tag: 'Coins PKR' }
+    { key: '5000', label: `${currency} 5,000 Note`, mult: 5000, color: '#f59e0b', tag: 'High Denom' },
+    { key: '1000', label: `${currency} 1,000 Note`, mult: 1000, color: '#3b82f6', tag: 'Standard' },
+    { key: '500', label: `${currency} 500 Note`, mult: 500, color: '#10b981', tag: 'Standard' },
+    { key: '100', label: `${currency} 100 Note`, mult: 100, color: '#ec4899', tag: 'Common' },
+    { key: '50', label: `${currency} 50 Note`, mult: 50, color: '#14b8a6', tag: 'Small Note' },
+    { key: '20', label: `${currency} 20 Note`, mult: 20, color: '#f97316', tag: 'Small Note' },
+    { key: '10', label: `${currency} 10 Note`, mult: 10, color: '#84cc16', tag: 'Small Note' },
+    { key: 'coins', label: `Loose Coins / Change (${currency})`, mult: 1, color: '#94a3b8', tag: 'Coins' }
   ];
 
   return (
@@ -152,7 +153,7 @@ export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos }) {
                           }}
                         />
                         <div style={{ width: '110px', textAlign: 'right', fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 900, color: rowSubtotal > 0 ? '#38bdf8' : 'var(--text-dim)' }}>
-                          Rs. {rowSubtotal.toLocaleString()}
+                          {currency} {rowSubtotal.toLocaleString()}
                         </div>
                       </div>
                     </div>
@@ -169,10 +170,10 @@ export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos }) {
                   🔒 Anti-Theft Blind Closing Rule
                 </h4>
                 <p style={{ fontSize: '12px', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                  Under Karachi Express POS security protocols, shift totals are not shown to counter staff until the physical cash count is locked into the database. This prevents cashiers from adjusting note counts to match register numbers.
+                  Under standard security protocols, shift totals are not shown to counter staff until the physical cash count is locked into the database. This prevents cashiers from adjusting note counts to match register numbers.
                 </p>
                 <div style={{ marginTop: '12px', borderTop: '1px solid var(--border-subtle)', paddingTop: '10px', fontSize: '12px', color: 'var(--text-dim)' }}>
-                  Opening Float: <strong>Rs. {activeShift?.openingCash?.toLocaleString() || '5,000'}</strong>
+                  Opening Float: <strong>{currency} {activeShift?.openingCash?.toLocaleString() || '5,000'}</strong>
                 </div>
               </div>
 
@@ -182,7 +183,7 @@ export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos }) {
                   Total Counted Physical Cash
                 </div>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '42px', fontWeight: 900, color: '#10b981', margin: '4px 0' }}>
-                  Rs. {physicalTotal.toLocaleString()}
+                  {currency} {physicalTotal.toLocaleString()}
                 </div>
                 <div style={{ fontSize: '11px', color: 'var(--text-dim)' }}>
                   System will calculate expected cash upon submission
@@ -255,19 +256,19 @@ export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos }) {
             <div style={{ background: '#04070e', borderRadius: '14px', padding: '20px', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted)' }}>
                 <span>Opening Cash Float:</span>
-                <span style={{ fontWeight: 700, color: '#fff' }}>Rs. {report.openingCash?.toLocaleString()}</span>
+                <span style={{ fontWeight: 700, color: '#fff' }}>{currency} {report.openingCash?.toLocaleString()}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', color: 'var(--text-muted)' }}>
                 <span>Paid Cash Sales (Shift Total):</span>
-                <span style={{ fontWeight: 700, color: '#fff' }}>Rs. {report.cashSalesTotal?.toLocaleString()}</span>
+                <span style={{ fontWeight: 700, color: '#fff' }}>{currency} {report.cashSalesTotal?.toLocaleString()}</span>
               </div>
               <div style={{ borderTop: '1px dashed var(--border-medium)', paddingTop: '8px', display: 'flex', justifyContent: 'space-between', fontSize: '15px', fontWeight: 800 }}>
                 <span>System Expected Cash:</span>
-                <span style={{ color: '#38bdf8' }}>Rs. {report.expectedCashTotal?.toLocaleString()}</span>
+                <span style={{ color: '#38bdf8' }}>{currency} {report.expectedCashTotal?.toLocaleString()}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '15px', fontWeight: 800 }}>
                 <span>Physical Cash Counted:</span>
-                <span style={{ color: '#10b981' }}>Rs. {report.physicalCashTotal?.toLocaleString()}</span>
+                <span style={{ color: '#10b981' }}>{currency} {report.physicalCashTotal?.toLocaleString()}</span>
               </div>
 
               <div style={{ borderTop: '2px solid var(--border-bright)', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -275,7 +276,7 @@ export function BlindCashScreen({ activeShift, onShiftClosed, onSwitchToPos }) {
                   {report.isShortage ? 'DISCREPANCY (SHORTAGE):' : report.isOverage ? 'DISCREPANCY (OVERAGE):' : 'DISCREPANCY:'}
                 </span>
                 <span style={{ fontFamily: 'var(--font-display)', fontSize: '26px', fontWeight: 900, color: report.isShortage ? '#ef4444' : report.isOverage ? '#f59e0b' : '#10b981' }}>
-                  {report.isBalanced ? 'BALANCED (Rs. 0)' : `Rs. ${Math.abs(report.cashDiscrepancy).toLocaleString()}`}
+                  {report.isBalanced ? `BALANCED (${currency} 0)` : `${currency} ${Math.abs(report.cashDiscrepancy).toLocaleString()}`}
                 </span>
               </div>
             </div>

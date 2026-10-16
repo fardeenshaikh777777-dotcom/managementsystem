@@ -1,6 +1,29 @@
-import React from 'react';
-import { Trash2, Plus, Minus, UtensilsCrossed, ShoppingBag, Car, Bike, Edit3 } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+  Trash2,
+  Plus,
+  Minus,
+  UtensilsCrossed,
+  ShoppingBag,
+  Car,
+  Bike,
+  Edit3,
+  CreditCard,
+  Banknote,
+  Truck,
+  RotateCcw,
+  Sparkles,
+  ChevronDown,
+  ChevronUp
+} from 'lucide-react';
 import { RIDERS_LIST } from '../data/mockData';
+import { BRAND } from '../config/brand';
+
+const QUICK_TABLES = [
+  'T-01', 'T-02', 'T-03', 'T-04',
+  'T-05', 'T-06', 'T-07', 'T-08',
+  'Hall-1', 'Hall-2', 'Family-1', 'VIP-1'
+];
 
 export function OrderCart({
   orderMode = 'takeaway',
@@ -8,13 +31,13 @@ export function OrderCart({
   onChangeOrderMode,
   dailyToken,
   tokenNumber,
-  tableNumber,
+  tableNumber = '',
   setTableNumber,
   onChangeTableNumber,
-  carDetails,
+  carDetails = '',
   setCarDetails,
   onChangeCarDetails,
-  deliveryInfo,
+  deliveryInfo = {},
   setDeliveryInfo,
   onChangeDeliveryInfo,
   cartItems = [],
@@ -26,8 +49,11 @@ export function OrderCart({
   setSrbTaxRate,
   onChangeTaxRate,
   onInitiateCheckout,
-  onResetDemo
+  onResetDemo,
+  currency = BRAND.currency
 }) {
+  const [showFullTableGrid, setShowFullTableGrid] = useState(false);
+
   const modeSetter = setOrderMode || onChangeOrderMode || (() => {});
   const activeToken = tokenNumber || dailyToken || 1;
   const tableSetter = setTableNumber || onChangeTableNumber || (() => {});
@@ -36,27 +62,21 @@ export function OrderCart({
   const taxSetter = setSrbTaxRate || onChangeTaxRate || (() => {});
 
   // Calculations
-  const subtotal = cartItems.reduce((acc, item) => acc + item.totalPrice, 0);
+  const subtotal = cartItems.reduce((acc, item) => acc + (item.totalPrice || 0), 0);
+  const totalItemCount = cartItems.reduce((acc, item) => acc + (item.quantity || 1), 0);
   const tax = Math.round((subtotal * srbTaxRate) / 100);
   const total = subtotal + tax;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-      {/* Top: Order Modes & Meta */}
-      <div className="cart-header">
-        <div className="order-modes-toggle-grid">
+    <div className="pos-order-cart-container">
+      {/* 1. Header: Mode Segmented Switcher & Contextual Meta */}
+      <div className="cart-header-section">
+        <div className="order-mode-segmented-control" role="tablist" aria-label="Order Mode">
           <button
             type="button"
-            className={`mode-btn ${orderMode === 'dine_in' ? 'active' : ''}`}
-            onClick={() => modeSetter('dine_in')}
-          >
-            <UtensilsCrossed size={16} />
-            <span>Dine-In</span>
-          </button>
-
-          <button
-            type="button"
-            className={`mode-btn ${orderMode === 'takeaway' ? 'active takeaway' : ''}`}
+            role="tab"
+            aria-selected={orderMode === 'takeaway'}
+            className={`mode-segment-btn ${orderMode === 'takeaway' ? 'active takeaway' : ''}`}
             onClick={() => modeSetter('takeaway')}
           >
             <ShoppingBag size={16} />
@@ -65,7 +85,20 @@ export function OrderCart({
 
           <button
             type="button"
-            className={`mode-btn ${orderMode === 'car_dine' ? 'active car-dine' : ''}`}
+            role="tab"
+            aria-selected={orderMode === 'dine_in'}
+            className={`mode-segment-btn ${orderMode === 'dine_in' ? 'active dine-in' : ''}`}
+            onClick={() => modeSetter('dine_in')}
+          >
+            <UtensilsCrossed size={16} />
+            <span>Dine-In</span>
+          </button>
+
+          <button
+            type="button"
+            role="tab"
+            aria-selected={orderMode === 'car_dine'}
+            className={`mode-segment-btn ${orderMode === 'car_dine' ? 'active car-dine' : ''}`}
             onClick={() => modeSetter('car_dine')}
           >
             <Car size={16} />
@@ -74,7 +107,9 @@ export function OrderCart({
 
           <button
             type="button"
-            className={`mode-btn ${orderMode === 'delivery' ? 'active' : ''}`}
+            role="tab"
+            aria-selected={orderMode === 'delivery'}
+            className={`mode-segment-btn ${orderMode === 'delivery' ? 'active delivery' : ''}`}
             onClick={() => modeSetter('delivery')}
           >
             <Bike size={16} />
@@ -82,210 +117,272 @@ export function OrderCart({
           </button>
         </div>
 
-        {/* Dynamic Mode Metadata Input Row */}
-        <div className="mode-meta-row">
-          <span className="token-pill-badge" title="Daily token sequence starting from #1 each morning">
-            #{String(activeToken).padStart(3, '0')}
-          </span>
-
-          {orderMode === 'dine_in' && (
-            <input
-              type="text"
-              className="mode-input-field"
-              placeholder="Table No (e.g., T-04 or Family Hall)"
-              value={tableNumber}
-              onChange={e => tableSetter(e.target.value)}
-            />
-          )}
-
-          {orderMode === 'takeaway' && (
-            <div style={{ fontSize: '12px', fontWeight: 600, color: '#f59e0b', paddingLeft: '4px' }}>
-              Counter Token Pickup
-            </div>
-          )}
-
-          {orderMode === 'car_dine' && (
-            <input
-              type="text"
-              className="mode-input-field"
-              placeholder="Car / Bike No & Model (e.g. LEA-4921 Corolla White)"
-              value={carDetails}
-              onChange={e => carSetter(e.target.value)}
-            />
-          )}
-
-          {orderMode === 'delivery' && (
-            <select
-              className="mode-input-field"
-              style={{ background: 'var(--bg-surface-elevated)', color: '#fff', padding: '4px' }}
-              value={deliveryInfo?.riderId || ''}
-              onChange={e => deliverySetter({ ...deliveryInfo, riderId: e.target.value })}
-            >
-              <option value="">Select Delivery Rider...</option>
-              {RIDERS_LIST.map(r => (
-                <option key={r.id} value={r.id}>{r.name}</option>
-              ))}
-            </select>
-          )}
-        </div>
-      </div>
-
-      {/* Cart Items List */}
-      <div className="cart-items-scroll">
-        {cartItems.length === 0 ? (
-          <div className="cart-empty-placeholder">
-            <UtensilsCrossed size={42} style={{ opacity: 0.3 }} />
-            <div>
-              <div style={{ fontFamily: 'var(--font-display)', fontSize: '16px', fontWeight: 700, color: '#e2e8f0' }}>
-                Active Bill is Empty
-              </div>
-              <p style={{ fontSize: '12px', color: 'var(--text-dim)', marginTop: '4px' }}>
-                Tap any dish on the left touch grid to punch into bill
-              </p>
-            </div>
+        {/* Dynamic Mode Metadata Container */}
+        <div className="mode-context-banner">
+          <div className="token-pill-badge" title="Daily running token sequence">
+            <span className="token-label">TOKEN</span>
+            <span className="token-number">#{String(activeToken).padStart(3, '0')}</span>
           </div>
-        ) : (
-          cartItems.map((item, index) => (
-            <div key={`${item.id}-${index}`} className="cart-item-row">
-              <div className="cart-item-top">
-                <div>
-                  <div className="cart-item-title">{item.name}</div>
-                  {item.urduName && (
-                    <div className="cart-item-urdu">{item.urduName}</div>
-                  )}
-                </div>
-                <div className="cart-item-subtotal">
-                  Rs. {item.totalPrice.toLocaleString()}
-                </div>
+
+          <div className="mode-context-details">
+            {orderMode === 'takeaway' && (
+              <div className="takeaway-status-info">
+                <span className="takeaway-highlight">Counter Express</span>
+                <span className="takeaway-sub">Self-pickup token</span>
               </div>
+            )}
 
-              <div className="cart-item-controls">
-                {item.weightKg ? (
-                  <div
-                    className="weight-indicator-badge"
-                    onClick={() => onOpenWeightModalForEdit(item, index)}
-                    title="Click to adjust weight"
-                  >
-                    ⚖️ {item.weightKg.toFixed(3)} kg @ Rs. {item.basePrice}/kg
-                    <Edit3 size={10} style={{ display: 'inline', marginLeft: '4px' }} />
-                  </div>
-                ) : (
-                  <div className="qty-counter-group">
-                    <button
-                      type="button"
-                      className="qty-btn"
-                      onClick={() => onUpdateQty(index, -1)}
-                    >
-                      <Minus size={12} />
-                    </button>
-                    <span className="qty-num">{item.quantity}</span>
-                    <button
-                      type="button"
-                      className="qty-btn"
-                      onClick={() => onUpdateQty(index, 1)}
-                    >
-                      <Plus size={12} />
-                    </button>
-                  </div>
-                )}
-
+            {orderMode === 'dine_in' && (
+              <div className="dine-in-picker-summary">
+                <input
+                  type="text"
+                  className="mode-inline-input"
+                  placeholder="Select table below or type..."
+                  value={tableNumber}
+                  onChange={e => tableSetter(e.target.value)}
+                  aria-label="Table number"
+                />
                 <button
                   type="button"
-                  className="del-item-btn"
-                  onClick={() => onRemoveItem(index)}
-                  title="Remove Item"
+                  className="table-toggle-btn"
+                  onClick={() => setShowFullTableGrid(prev => !prev)}
+                  title="Toggle Table Grid"
                 >
-                  <Trash2 size={14} />
+                  {showFullTableGrid ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                 </button>
               </div>
+            )}
+
+            {orderMode === 'car_dine' && (
+              <input
+                type="text"
+                className="mode-inline-input car-input"
+                placeholder="Car No & Color (e.g. LEA-4921 White Corolla)"
+                value={carDetails}
+                onChange={e => carSetter(e.target.value)}
+                aria-label="Car details"
+              />
+            )}
+
+            {orderMode === 'delivery' && (
+              <select
+                className="mode-inline-select"
+                value={deliveryInfo?.riderId || ''}
+                onChange={e => deliverySetter({ ...deliveryInfo, riderId: e.target.value })}
+                aria-label="Select delivery rider"
+              >
+                <option value="">Select Rider...</option>
+                {RIDERS_LIST.map(r => (
+                  <option key={r.id} value={r.id}>
+                    {r.name} ({r.phone})
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+        </div>
+
+        {/* Clean Table Picker Grid (Shown for Dine-In mode) */}
+        {orderMode === 'dine_in' && (
+          <div className={`table-picker-grid-wrapper ${showFullTableGrid ? 'expanded' : ''}`}>
+            <div className="table-picker-grid">
+              {QUICK_TABLES.map(table => {
+                const isSelected = tableNumber === table;
+                return (
+                  <button
+                    key={table}
+                    type="button"
+                    className={`table-chip-btn ${isSelected ? 'selected' : ''}`}
+                    onClick={() => tableSetter(table)}
+                  >
+                    {table}
+                  </button>
+                );
+              })}
             </div>
-          ))
+          </div>
         )}
       </div>
 
-      {/* Cart Summary & 1-Click Checkout Footer */}
-      <div className="cart-footer">
-        <div className="bill-summary-table">
-          <div className="bill-row">
-            <span>Items Subtotal:</span>
-            <span>Rs. {subtotal.toLocaleString()}</span>
+      {/* 2. Items List / Empty State */}
+      <div className="cart-items-scroll">
+        {cartItems.length === 0 ? (
+          <div className="cart-empty-placeholder">
+            <div className="empty-cloche-art">
+              <UtensilsCrossed size={44} className="empty-cloche-icon" />
+              <div className="empty-cloche-ring" />
+            </div>
+            <div className="empty-cart-text">
+              <h4 className="empty-cart-title">Order Cart is Empty</h4>
+              <p className="empty-cart-subtitle">
+                Tap any dish on the menu grid to add it to this bill.
+              </p>
+            </div>
+            <div className="empty-cart-shortcuts">
+              <span className="shortcut-tag"><kbd>F1</kbd> Cash Pay</span>
+              <span className="shortcut-tag"><kbd>F2</kbd> Card</span>
+              <span className="shortcut-tag"><kbd>F4</kbd> Void</span>
+            </div>
+          </div>
+        ) : (
+          <div className="cart-items-list">
+            <div className="cart-items-meta-header">
+              <span>Items ({totalItemCount})</span>
+              <span>Price</span>
+            </div>
+
+            {cartItems.map((item, index) => (
+              <div key={`${item.id}-${index}`} className="cart-item-card">
+                <div className="cart-item-info-row">
+                  <div className="cart-item-titles">
+                    <span className="cart-item-en-name">{item.name}</span>
+                    {item.urduName && (
+                      <span className="cart-item-urdu-name" dir="rtl">{item.urduName}</span>
+                    )}
+                  </div>
+                  <div className="cart-item-subtotal-block">
+                    <span className="cart-item-subtotal">
+                      {currency} {(item.totalPrice || 0).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="cart-item-controls-row">
+                  {item.weightKg ? (
+                    <button
+                      type="button"
+                      className="cart-weight-badge"
+                      onClick={() => onOpenWeightModalForEdit && onOpenWeightModalForEdit(item, index)}
+                      title="Adjust Scale Weight"
+                    >
+                      <span className="weight-scale-icon">⚖️</span>
+                      <span className="weight-val">{item.weightKg.toFixed(3)} kg</span>
+                      <span className="weight-rate">@{currency} {item.unitPrice || item.basePrice}/kg</span>
+                      <Edit3 size={11} className="weight-edit-icon" />
+                    </button>
+                  ) : (
+                    <div className="touch-qty-stepper">
+                      <button
+                        type="button"
+                        className="qty-stepper-btn minus"
+                        onClick={() => onUpdateQty && onUpdateQty(index, -1)}
+                        aria-label="Decrease quantity"
+                      >
+                        <Minus size={15} />
+                      </button>
+                      <span className="qty-stepper-val">{item.quantity}</span>
+                      <button
+                        type="button"
+                        className="qty-stepper-btn plus"
+                        onClick={() => onUpdateQty && onUpdateQty(index, 1)}
+                        aria-label="Increase quantity"
+                      >
+                        <Plus size={15} />
+                      </button>
+                    </div>
+                  )}
+
+                  <button
+                    type="button"
+                    className="cart-delete-item-btn"
+                    onClick={() => onRemoveItem && onRemoveItem(index)}
+                    aria-label={`Remove ${item.name} from bill`}
+                    title="Remove Item"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 3. Sticky Totals & Big Pay Buttons Footer */}
+      <div className="cart-footer-sticky">
+        {/* Bill Summary Table */}
+        <div className="bill-summary-card">
+          <div className="bill-calc-row">
+            <span className="calc-label">Subtotal</span>
+            <span className="calc-value">{currency} {subtotal.toLocaleString()}</span>
           </div>
 
-          <div className="bill-row" style={{ alignItems: 'center' }}>
-            <span>
-              Sindh Sales Tax (SRB):
+          <div className="bill-calc-row tax-row">
+            <span className="calc-label">
+              Sindh Sales Tax (SRB)
               <button
                 type="button"
-                onClick={() => setSrbTaxRate(srbTaxRate === 0 ? 5 : 0)}
-                style={{
-                  marginLeft: '6px',
-                  padding: '2px 6px',
-                  borderRadius: '4px',
-                  background: srbTaxRate > 0 ? '#3b82f6' : 'var(--bg-surface-elevated)',
-                  color: '#fff',
-                  fontSize: '10px',
-                  fontWeight: 700
-                }}
+                className={`tax-toggle-pill ${srbTaxRate > 0 ? 'active' : ''}`}
+                onClick={() => taxSetter(srbTaxRate === 0 ? 5 : 0)}
+                title="Toggle SRB Sales Tax Rate"
               >
                 {srbTaxRate}%
               </button>
             </span>
-            <span>Rs. {tax.toLocaleString()}</span>
+            <span className="calc-value">{currency} {tax.toLocaleString()}</span>
           </div>
 
-          <div className="bill-row total-row">
-            <span>NET TOTAL:</span>
-            <span className="total-amount">Rs. {total.toLocaleString()}</span>
+          <div className="bill-calc-row total-row">
+            <div className="total-title-block">
+              <span className="total-main-label">NET PAYABLE</span>
+              <span className="total-tax-status">
+                {srbTaxRate > 0 ? 'Tax Inclusive' : 'Zero-Rated / Tax Free'}
+              </span>
+            </div>
+            <div className="total-value-block">
+              <span className="total-currency">{currency}</span>
+              <span className="total-number">{total.toLocaleString()}</span>
+            </div>
           </div>
         </div>
 
-        {/* 1-Click Checkout Buttons */}
-        <div className="checkout-actions-grid">
+        {/* Big Sticky Checkout Actions Grid */}
+        <div className="sticky-pay-actions-grid">
           <button
             type="button"
-            className="checkout-btn cash"
+            className="big-pay-btn primary-cash"
             disabled={cartItems.length === 0}
-            onClick={() => onInitiateCheckout('cash')}
+            onClick={() => onInitiateCheckout && onInitiateCheckout('cash')}
           >
-            <span>CASH PAY</span>
-            <span className="key-hint">Press F1</span>
+            <div className="pay-btn-content">
+              <div className="pay-btn-main">
+                <Banknote size={20} className="pay-icon" />
+                <span className="pay-title">CASH PAY</span>
+              </div>
+              <span className="pay-hotkey-badge">F1</span>
+            </div>
           </button>
 
           <button
             type="button"
-            className="checkout-btn card"
+            className="pay-btn secondary-card"
             disabled={cartItems.length === 0}
-            onClick={() => onInitiateCheckout('card')}
+            onClick={() => onInitiateCheckout && onInitiateCheckout('card')}
           >
-            <span>CARD</span>
-            <span className="key-hint">F2</span>
+            <CreditCard size={18} />
+            <span className="pay-sub-label">CARD</span>
+            <span className="hotkey-mini">F2</span>
           </button>
 
           <button
             type="button"
-            className="checkout-btn rider"
+            className="pay-btn secondary-cod"
             disabled={cartItems.length === 0}
-            onClick={() => onInitiateCheckout('rider_cod')}
+            onClick={() => onInitiateCheckout && onInitiateCheckout('rider_cod')}
           >
-            <span>COD</span>
-            <span className="key-hint">F3</span>
+            <Truck size={18} />
+            <span className="pay-sub-label">COD</span>
+            <span className="hotkey-mini">F3</span>
           </button>
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginTop: '8px' }}>
+        {/* Footer Utility Links */}
+        <div className="cart-utility-links">
           {cartItems.length > 0 && (
             <button
               type="button"
+              className="clear-bill-link"
               onClick={onClearCart}
-              style={{
-                background: 'transparent',
-                color: 'var(--text-dim)',
-                fontSize: '11px',
-                fontWeight: 600,
-                textDecoration: 'underline',
-                border: 'none',
-                cursor: 'pointer'
-              }}
             >
               Clear Current Bill
             </button>
@@ -294,18 +391,12 @@ export function OrderCart({
           {onResetDemo && (
             <button
               type="button"
+              className="reset-demo-link"
               onClick={onResetDemo}
-              style={{
-                background: 'transparent',
-                color: '#64748b',
-                fontSize: '11px',
-                fontWeight: 600,
-                border: 'none',
-                cursor: 'pointer'
-              }}
-              title="Reset orders and cash drawers for a clean client demo"
+              title="Reset orders and cash drawers for a pristine client demonstration"
             >
-              🔄 Reset Demo Data
+              <RotateCcw size={11} style={{ display: 'inline', marginRight: '4px' }} />
+              Reset Demo
             </button>
           )}
         </div>
@@ -313,3 +404,5 @@ export function OrderCart({
     </div>
   );
 }
+
+export default OrderCart;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Wifi, 
   WifiOff, 
@@ -11,10 +11,15 @@ import {
   DollarSign, 
   Smartphone, 
   UserCheck, 
-  Database,
-  ChevronDown
+  ChevronDown,
+  Sparkles,
+  Palette,
+  Clock,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { ROLES } from '../services/authService';
+import { BRAND, BRAND_PRESETS } from '../config/brand';
 
 export function HeaderBar({
   isOnline,
@@ -30,9 +35,50 @@ export function HeaderBar({
   onOpenShiftCloseModal,
   currentUser,
   onChangeRole,
-  isRemoteConfigured
+  isRemoteConfigured,
+  brand,
+  onOpenSplash,
+  onSelectBrand
 }) {
   const [showRoleMenu, setShowRoleMenu] = useState(false);
+  const currentBrand = brand || BRAND;
+
+  // Real-Time Digital Counter Clock
+  const [currentTime, setCurrentTime] = useState(() => {
+    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+  });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true }));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // High-Contrast Theme Toggle
+  const [isHighContrast, setIsHighContrast] = useState(() => {
+    if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem('pos_high_contrast') === 'true';
+    }
+    return false;
+  });
+
+  function handleToggleContrast() {
+    setIsHighContrast(prev => {
+      const next = !prev;
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('pos_high_contrast', String(next));
+      }
+      if (typeof document !== 'undefined') {
+        if (next) {
+          document.documentElement.classList.add('pos-high-contrast');
+        } else {
+          document.documentElement.classList.remove('pos-high-contrast');
+        }
+      }
+      return next;
+    });
+  }
 
   const VIEWS = [
     { id: 'pos', label: 'Counter POS', icon: LayoutGrid, minRole: null },
@@ -50,7 +96,7 @@ export function HeaderBar({
 
   function handleViewClick(view) {
     if (view.minRole && !view.minRole.includes(currentUser?.role)) {
-      alert(`Access Restricted: The ${view.label} screen requires Manager or Owner credentials. Please switch roles in the header to preview.`);
+      alert(`Access Restricted: The ${view.label} screen requires Manager or Owner credentials. Please switch roles in the user menu to preview.`);
       return;
     }
     onSelectView(view.id);
@@ -58,37 +104,45 @@ export function HeaderBar({
 
   return (
     <header className="pos-header">
-      {/* Brand & Terminal Info */}
-      <div className="pos-logo-badge">
-        <div className="pos-logo-icon">🔥</div>
+      {/* 1. Left: Brand & Terminal Info */}
+      <div 
+        className="pos-logo-badge" 
+        onClick={onOpenSplash}
+        style={{ cursor: onOpenSplash ? 'pointer' : 'default' }}
+        title={onOpenSplash ? 'Click to preview Brand & Staff Splash' : currentBrand.name}
+      >
+        <div 
+          className="pos-logo-icon"
+          style={{
+            background: `linear-gradient(135deg, ${currentBrand.accentColor || '#f59e0b'}, ${currentBrand.accentHover || '#b45309'})`
+          }}
+        >
+          {currentBrand.logoPath ? (
+            <img src={currentBrand.logoPath} alt={currentBrand.name} style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+          ) : (
+            currentBrand.logoEmoji || '🍽️'
+          )}
+        </div>
         <div className="pos-title-block">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <h1 style={{ margin: 0 }}>KARACHI EXPRESS POS</h1>
-            {/* Clear Mode Badge: Distinguishes Demo Mode vs Remote Connected */}
-            <span
-              style={{
-                fontSize: '10px',
-                fontWeight: 800,
-                padding: '2px 8px',
-                borderRadius: '6px',
-                textTransform: 'uppercase',
-                letterSpacing: '0.04em',
-                background: isRemoteConfigured ? 'rgba(16, 185, 129, 0.2)' : 'rgba(245, 158, 11, 0.2)',
-                color: isRemoteConfigured ? '#34d399' : '#fbbf24',
-                border: isRemoteConfigured ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid rgba(245, 158, 11, 0.4)'
-              }}
-            >
-              {isRemoteConfigured ? 'Supabase Live' : 'Demo Mode (IndexedDB)'}
+          <div className="pos-title-row">
+            <h1 className="pos-title-text">{currentBrand.name.toUpperCase()}</h1>
+            {currentBrand.nameUrdu && (
+              <span className="font-urdu pos-urdu-badge" style={{ color: currentBrand.accentColor || 'var(--color-brand-primary)' }}>
+                {currentBrand.nameUrdu}
+              </span>
+            )}
+            <span className={`pos-mode-tag ${isRemoteConfigured ? 'remote' : 'demo'}`}>
+              {isRemoteConfigured ? 'Supabase Live' : 'Demo Mode'}
             </span>
           </div>
-          <p>
-            Burns Road & Highway • {activeShift?.terminalId || 'POS-01'} • Shift #{activeShift?.sessionNumber || 104}
+          <p className="pos-subtitle-text">
+            {currentBrand.tagline || currentBrand.branchInfo} • {activeShift?.terminalId || 'POS-01'} • Shift #{activeShift?.sessionNumber || 104}
           </p>
         </div>
       </div>
 
-      {/* Center Navigation Switcher Tabs */}
-      <div style={{ display: 'flex', gap: '6px', background: 'var(--bg-app)', padding: '4px', borderRadius: '10px', border: '1px solid var(--border-subtle)' }}>
+      {/* 2. Center: Screen Navigation Tabs */}
+      <nav className="pos-view-nav" aria-label="POS Screen Views">
         {VIEWS.map(v => {
           const Icon = v.icon;
           const isActive = activeView === v.id;
@@ -99,78 +153,54 @@ export function HeaderBar({
               key={v.id}
               type="button"
               onClick={() => handleViewClick(v)}
-              style={{
-                padding: '6px 12px',
-                borderRadius: '8px',
-                background: isActive ? 'var(--color-brand-primary)' : 'transparent',
-                color: isActive ? '#090d16' : isLocked ? 'var(--text-dim)' : 'var(--text-muted)',
-                fontFamily: 'var(--font-display)',
-                fontSize: '12px',
-                fontWeight: 800,
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'all 0.12s ease',
-                opacity: isLocked ? 0.6 : 1
-              }}
+              className={`pos-view-btn ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}`}
               title={isLocked ? 'Restricted: Requires Manager or Owner role' : v.label}
+              style={isActive ? { background: currentBrand.accentColor || 'var(--color-brand-primary)' } : {}}
             >
               <Icon size={14} />
               <span>{v.label}</span>
-              {isLocked && <span style={{ fontSize: '9px', background: '#334155', color: '#94a3b8', padding: '1px 4px', borderRadius: '4px' }}>LOCK</span>}
+              {isLocked && <span className="pos-lock-pill">LOCK</span>}
             </button>
           );
         })}
-      </div>
+      </nav>
 
-      {/* Right Controls: Role Switcher, Network, Load-Shedding & Shortcuts */}
+      {/* 3. Right: System Bar (Clock, Calm Network Status, Theme, Role, Actions) */}
       <div className="pos-status-group">
-        {/* Role Switcher Dropdown (Priority 0 RBAC) */}
+        {/* Live Digital Clock */}
+        <div className="pos-header-clock" title="Counter Local Clock">
+          <Clock size={13} />
+          <span>{currentTime}</span>
+        </div>
+
+        {/* Theme Contrast Toggle */}
+        <button
+          type="button"
+          onClick={handleToggleContrast}
+          className="pos-header-icon-btn"
+          title={isHighContrast ? 'Switch to Standard Theme' : 'Switch to High-Contrast OLED Theme'}
+        >
+          {isHighContrast ? <Sun size={14} color="#fbbf24" /> : <Moon size={14} />}
+        </button>
+
+        {/* User Role Menu */}
         <div style={{ position: 'relative' }}>
           <button
             type="button"
             onClick={() => setShowRoleMenu(prev => !prev)}
-            style={{
-              padding: '6px 10px',
-              borderRadius: '8px',
-              background: 'var(--bg-surface-elevated)',
-              color: '#38bdf8',
-              border: '1px solid var(--border-subtle)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontSize: '11px',
-              fontWeight: 800,
-              cursor: 'pointer'
-            }}
-            title="Active user & role permissions"
+            className="pos-user-chip-btn"
+            title="Active user & permissions"
           >
             <UserCheck size={13} color="#38bdf8" />
-            <span>{currentUser?.name || 'Asad Ullah'} ({currentUser?.role?.toUpperCase() || 'CASHIER'})</span>
+            <span className="pos-user-name">
+              {currentUser?.name || 'Asad Ullah'} ({currentUser?.role?.toUpperCase() || 'CASHIER'})
+            </span>
             <ChevronDown size={12} />
           </button>
 
           {showRoleMenu && (
-            <div
-              style={{
-                position: 'absolute',
-                top: '100%',
-                right: 0,
-                marginTop: '6px',
-                background: '#090d16',
-                border: '1px solid var(--border-medium)',
-                borderRadius: '10px',
-                padding: '6px',
-                boxShadow: 'var(--shadow-lg)',
-                zIndex: 100,
-                minWidth: '200px'
-              }}
-            >
-              <div style={{ fontSize: '10px', color: 'var(--text-dim)', padding: '4px 8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Switch Role Simulation
-              </div>
+            <div className="pos-user-dropdown-menu">
+              <div className="pos-dropdown-header">Staff Role Simulation</div>
               {DEMO_ROLES.map(r => (
                 <button
                   key={r.id}
@@ -179,55 +209,69 @@ export function HeaderBar({
                     onChangeRole(r);
                     setShowRoleMenu(false);
                   }}
-                  style={{
-                    width: '100%',
-                    textAlign: 'left',
-                    padding: '8px 10px',
-                    borderRadius: '6px',
-                    background: currentUser?.role === r.role ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
-                    color: currentUser?.role === r.role ? '#38bdf8' : '#e2e8f0',
-                    border: 'none',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}
+                  className={`pos-role-option-btn ${currentUser?.role === r.role ? 'selected' : ''}`}
                 >
                   <span>{r.label}</span>
-                  <span style={{ fontSize: '10px', color: 'var(--text-dim)' }}>{r.name.split(' ')[0]}</span>
+                  <span className="pos-role-sub">{r.name.split(' ')[0]}</span>
                 </button>
               ))}
+
+              {onSelectBrand && (
+                <>
+                  <div className="pos-dropdown-divider">
+                    <Palette size={11} />
+                    <span>Quick Client Presets</span>
+                  </div>
+                  {Object.values(BRAND_PRESETS).map(bp => (
+                    <button
+                      key={bp.id}
+                      type="button"
+                      onClick={() => {
+                        onSelectBrand(bp);
+                        setShowRoleMenu(false);
+                      }}
+                      className={`pos-role-option-btn ${currentBrand.id === bp.id ? 'active-brand' : ''}`}
+                    >
+                      <span>{bp.logoEmoji} {bp.name}</span>
+                      {currentBrand.id === bp.id && <span style={{ fontSize: '10px', color: '#10b981' }}>Active</span>}
+                    </button>
+                  ))}
+                </>
+              )}
             </div>
           )}
         </div>
 
-        {/* Load-Shedding / Offline Simulator Toggle */}
+        {/* Brand Splash / Lock Screen Launcher */}
+        {onOpenSplash && (
+          <button
+            type="button"
+            onClick={onOpenSplash}
+            className="pos-header-action-btn brand-btn"
+            title="Open Brand Splash & Staff Sign-in"
+          >
+            <Sparkles size={13} />
+            <span>Brand Info</span>
+          </button>
+        )}
+
+        {/* Load-Shedding Simulation Cut */}
         <button
           type="button"
           onClick={onToggleSimulateOffline}
           title="Toggle Load-Shedding / Internet Cut Simulation"
-          style={{
-            padding: '6px 10px',
-            borderRadius: '8px',
-            background: isSimulatedOffline ? '#7f1d1d' : 'var(--bg-surface-elevated)',
-            color: isSimulatedOffline ? '#fca5a5' : 'var(--text-muted)',
-            border: isSimulatedOffline ? '1px solid #ef4444' : '1px solid var(--border-subtle)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontSize: '11px',
-            fontWeight: 700,
-            cursor: 'pointer'
-          }}
+          className={`pos-header-action-btn load-shed-btn ${isSimulatedOffline ? 'cut-active' : ''}`}
         >
           <Zap size={13} color={isSimulatedOffline ? '#ef4444' : '#f59e0b'} />
-          {isSimulatedOffline ? '⚡ Cut Active' : 'Cut Internet'}
+          <span>{isSimulatedOffline ? '⚡ Cut Active' : 'Cut Internet'}</span>
         </button>
 
-        {/* Live Online/Offline Status Indicator */}
-        <div className={`status-pill ${isOnline && !isSimulatedOffline ? 'online' : 'offline'}`}>
+        {/* Calm & Clear Online/Offline Indicator */}
+        <div 
+          className={`status-pill calm-status ${isOnline && !isSimulatedOffline ? 'online' : 'offline'}`}
+          title={isOnline && !isSimulatedOffline ? 'Online: Transactions sync instantly to cloud' : 'Offline Safe Mode: Full local operation with background outbox queue'}
+        >
+          <span className="status-dot-pulse" />
           {isOnline && !isSimulatedOffline ? (
             <>
               <Wifi size={13} />
@@ -249,56 +293,31 @@ export function HeaderBar({
             disabled={isSyncing}
             className="status-pill syncing"
             title="Click to push offline orders to cloud"
-            style={{ cursor: 'pointer' }}
           >
             <RefreshCw size={13} className={isSyncing ? 'animate-spin' : ''} />
             <span>{pendingSyncCount} Outbox</span>
           </button>
         )}
 
-        {/* F4: Manager Void Button (Automation 3) */}
+        {/* F4: Manager Void Button */}
         <button
           type="button"
           onClick={onOpenVoidModal}
-          style={{
-            background: 'var(--color-ruby-light)',
-            color: '#f87171',
-            border: '1px solid rgba(239, 68, 68, 0.4)',
-            padding: '6px 10px',
-            borderRadius: '8px',
-            fontSize: '11px',
-            fontWeight: 700,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            cursor: 'pointer'
-          }}
+          className="pos-header-action-btn void-btn"
           title="Void order with 4-digit Manager PIN (Shortcut: F4)"
         >
           <ShieldAlert size={13} />
           <span>Void (F4)</span>
         </button>
 
-        {/* F8: Blind Cash Shift Close Button (Automation 4) */}
+        {/* F8: Blind Cash Shift Close Button */}
         <button
           type="button"
           onClick={onOpenShiftCloseModal}
-          style={{
-            background: 'linear-gradient(135deg, #1e293b, #0f172a)',
-            color: '#e2e8f0',
-            border: '1px solid var(--border-medium)',
-            padding: '6px 10px',
-            borderRadius: '8px',
-            fontSize: '11px',
-            fontWeight: 700,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px',
-            cursor: 'pointer'
-          }}
+          className="pos-header-action-btn shift-btn"
           title="Blind Cash Counting & Shift Locking (Shortcut: F8)"
         >
-          <Lock size={13} color="#f59e0b" />
+          <Lock size={13} color="var(--color-brand-primary)" />
           <span>Close Shift (F8)</span>
         </button>
       </div>

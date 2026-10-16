@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { DollarSign, CreditCard, Bike, Printer, X, Check } from 'lucide-react';
+import { BRAND } from '../config/brand';
 
 export function PaymentModal({
   totalAmount,
   initialMethod = 'cash',
   tokenNumber,
   onCompletePayment,
-  onClose
+  onClose,
+  currency = BRAND.currency
 }) {
   const [method, setMethod] = useState(initialMethod);
   const [tenderedAmount, setTenderedAmount] = useState(totalAmount);
@@ -147,7 +149,7 @@ export function PaymentModal({
               Total Payable Amount
             </div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '38px', fontWeight: 900, color: '#f59e0b' }}>
-              Rs. {totalAmount.toLocaleString()}
+              {currency} {totalAmount.toLocaleString()}
             </div>
           </div>
 
@@ -155,7 +157,7 @@ export function PaymentModal({
           {method === 'cash' && (
             <div>
               <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-muted)', marginBottom: '8px' }}>
-                Quick Pakistani Note Tender:
+                Quick Note Tender:
               </div>
 
               {/* Note Preset Buttons */}
@@ -173,7 +175,7 @@ export function PaymentModal({
                     border: '1px solid var(--border-subtle)'
                   }}
                 >
-                  Exact (Rs. {totalAmount})
+                  Exact ({currency} {totalAmount})
                 </button>
 
                 <button
@@ -189,7 +191,7 @@ export function PaymentModal({
                     border: '1px solid var(--border-subtle)'
                   }}
                 >
-                  +Rs. 500
+                  +{currency} 500
                 </button>
 
                 <button
@@ -205,7 +207,7 @@ export function PaymentModal({
                     border: '1px solid var(--border-subtle)'
                   }}
                 >
-                  +Rs. 1,000
+                  +{currency} 1,000
                 </button>
 
                 <button
@@ -221,7 +223,7 @@ export function PaymentModal({
                     border: '1px solid var(--border-subtle)'
                   }}
                 >
-                  Rs. 5,000 Note
+                  {currency} 5,000 Note
                 </button>
               </div>
 
@@ -259,7 +261,7 @@ export function PaymentModal({
                 <div style={{ textAlign: 'right' }}>
                   <div style={{ fontSize: '11px', color: 'var(--text-dim)' }}>Change Return:</div>
                   <div style={{ fontFamily: 'var(--font-display)', fontSize: '24px', fontWeight: 900, color: changeDue > 0 ? '#10b981' : '#94a3b8' }}>
-                    Rs. {changeDue.toLocaleString()}
+                    {currency} {changeDue.toLocaleString()}
                   </div>
                 </div>
               </div>
